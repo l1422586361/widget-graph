@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./lib/bootstrap-3.4.1-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./src/css/main.css">
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 左栏 -->
+            <div class="col-md-2" style="padding-top: 20px;">
+                <div class="panel">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <!-- <input type="text" class="form-control" id="exampleInputName2" placeholder="笔记本id"> -->
+                            <input type="text" class="form-control" id="text" placeholder="关键字">
+                        </div>
+                        <!-- <button type="button" class="btn btn-default" onclick="getBacklink1()">查询</button> -->
+                        <button id="btnGetNode" type="button" class="btn btn-default" onclick="getNote()">查询</button>
+                    </form>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">信息展示</h3>
+                    </div>
+                    <!-- <div class="panel-body" id="note-info"> -->
+                    <!-- 信息展示主要 -->
+                    <!-- <ul></ul> -->
+
+                    <!-- </div> -->
+                    <div class="list-group" id="note-info" style="height: 700px;overflow:auto;">
+                        <!-- active -->
+                        <!-- 信息内容插入 -->
+                        <!-- <li class="list-group-item" style="height: 70px;padding: 16px 15px;">
+                            <div style="float:left;">
+                                <h4 class="list-group-item-heading" id="20211107184955-us2ys4d" data-name="test">01_Linux</h4>
+                                <p class="list-group-item-text">...</p>
+                            </div>
+                            <div type="button" class="btn btn-default" style="float:right;"><span
+                                    class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>
+
+                        </li> -->
+
+                    </div>
+                </div>
+
+
+
+
+
+
+            </div>
+
+            <!-- 中间图层 -->
+            <div class="col-md-8" id="mountNode"
+                style="height: 800px;border: 1px solid gray;border-radius: 20px;margin-top: 20px;">
+                <div class="btn-group g6-toolbar-ul" role="group" aria-label="...">
+                    <button type="file" class="btn btn-default" onclick="select_file()">导入数据</button>
+                    <button type="button" class="btn btn-default" onclick='saveData()'>保存数据</button>
+                    <input class="button" type="file" id="file" onchange="importData(this.files)" style="display:none" />
+                </div>
+            </div>
+            <!-- 右栏 -->
+            <div class="col-md-2" style="padding-top: 20px;">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">详细信息</h3>
+                    </div>
+                    <div class="panel-body" id="detailInfo" style="height: 500px;">
+                        <!-- 详细信息主要 -->
+
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">日志窗口</h3>
+                    </div>
+                    <div class="panel-body" style="height: 200px;">
+                        日志窗口主要
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <script src="./lib/jquery-1.12.4.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="./lib/bootstrap-3.4.1-dist/js/bootstrap.min.js"></script>
+</body>
+
+<script type="module">
+    import { config, } from "./src/js/config.js"
+    import { getBacklink, getBlockByID, } from "./src/utils/api.js"
+    import { addEdge, addNode,updateNodeTo1, hasEdge, getBackNodeCount, getFrontLinks, getDocInfoByKey, delNodeEdge,getDocInfoByKey2,getDocCount, } from "./src/js/integrate.js"
+
+
+
+    // init graph
+    const container = document.getElementById('mountNode');
+    config.forceGraph.width = container.scrollWidth || 1000;
+    config.forceGraph.height = container.scrollHeight || 600;
+    config.forceGraph.container = 'mountNode';
+
+    // 节点右键菜单
+    const menu = new G6.Menu({
+        // https://g6.antv.vision/zh/examples/tool/contextMenu 右侧Menu配置项
+        offsetX: -280,
+        offsetY: -30,
+        itemTypes: ['node'],
+        getContent(e) {
+            return `<div class="btn-group-vertical" role="group" aria-label="...">
+                            <button type="button" class="btn btn-default" id="addAll">扩展所有关系</button>
+                            <button type="button" class="btn btn-default" id="addBacklink">仅扩展反链</button>
+                            <button type="button" class="btn btn-default" id="addFrontlink">仅扩展正链</button>
+                            <button type="button" class="btn btn-default" id="delNodeEdge">删除此节点及关系</button>
+                            `
+        },
+        handleMenuClick(target, item, graph) {
+            // 右键菜单事件
+            // console.log("右键", target, item, graph)
+            let id = item._cfg.id
+            // console.log(id)
+            switch (target.id) {
+                case "addAll":
+                    updateNodeTo1(graph,item._cfg.id)
+                    Promise.all([getBacklink(item._cfg.id),getFrontLinks(item._cfg.id)]).then(e =>{
+                        for (let refNode of e[0].backlinks) {
+                            addNode(graph, refNode.id, refNode.name)
+                            // addEdge(graph, id,refNode.id)
+                            addEdge(graph, refNode.id, id)
+                        }
+                        for (let refNode of e[1]) {
+                            addNode(graph, refNode.targetId, refNode.targetName)
+                            // addEdge(graph, id,refNode.id)
+                            addEdge(graph, id, refNode.targetId)
+                        }
+                    })
+                case "addBacklink":
+                    // 添加反链
+                    // console.log("addBacklink",item)
+                    updateNodeTo1(graph,item._cfg.id)
+                    getBacklink(item._cfg.id).then(res => {
+                        // console.log("test", res)
+                        for (let refNode of res.backlinks) {
+                            addNode(graph, refNode.id, refNode.name)
+                            // addEdge(graph, id,refNode.id)
+                            addEdge(graph, refNode.id, id)
+                        }
+                    })
+                    break;
+                case "addFrontlink":
+                    // 添加正链
+                    updateNodeTo1(graph,item._cfg.id)
+                    getFrontLinks(item._cfg.id).then(res => {
+                        console.log("test", res)
+                        for (let refNode of res) {
+                            addNode(graph, refNode.targetId, refNode.targetName)
+                            // addEdge(graph, id,refNode.id)
+                            addEdge(graph, id, refNode.targetId)
+                        }
+                    })
+                    break;
+                case "delNodeEdge":
+                    // 删除节点和边
+                    delNodeEdge(graph, item._cfg.id)
+                    break;
+            }
+        },
+    });
+
+
+
+    config.forceGraph.plugins = [menu]
+    const graph = new G6.Graph(config.forceGraph);
+    graph.read(config.data)
+
+    // 上传文件/导入数据
+    window.select_file = function (){
+        $("#file").trigger("click")
+    }
+    window.importData = function (files) {
+        let file = files[0]
+        console.log(file)
+        let reader = new FileReader();
+        reader.readAsText(file, "UTF-8")
+        reader.onload = function (e) {
+            let res = JSON.parse(e.target.result)
+            graph.changeData(res)
+        }
+    }
+
+    // 下载文件/保存数据
+    window.saveData = function () {
+        let graphData = graph.save()
+        let saveData = {}
+        saveData.nodes = graphData.nodes
+        saveData.edges = graphData.edges
+        console.log("saveData", saveData)
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
+        let downloadAnchorNode = document.createElement('a')
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "result.json")
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    // getBacklink1 获取反链，并进行图层渲染
+    // window.getBacklink1 = function () {
+    //     const id = '20211107184955-us2ys4d'
+
+    //     // addNode(graph, id)
+    //     getBlockByID(id).then(function (res) {
+    //         addNode(graph, id, res.content)
+    //         getBacklink(id).then(function (res) {
+    //             for (let refNode of res.backlinks) {
+    //                 addNode(graph, refNode.id, refNode.name)
+    //                 addEdge(graph, id, refNode.id)
+    //             }
+    //         })
+    //     })
+
+    // }
+
+
+    // 查询关键字获取文档
+    import { searchDocs, fullTextSearchBlock } from "./src/utils/api.js"
+    window.getNote = function () {
+        let key = document.getElementById('text').value
+        // let key = "linux"
+        $(function () {
+            // 移除元素
+            $("#note-info li").remove()
+            $("#note-info").append("<h5>&nbsp&nbsp&nbsp加载中....请稍等，如数据过大，可查看console确认是否正在执行</h4>")
+        })
+        // 全文检索关键字
+
+        getDocInfoByKey2(key).then(e => {
+            // console.log("eeee",e)
+            $("#note-info h5").remove()
+            for (let doc of e) {
+                // console.log("get",e.id)
+                let rr = `<li class="list-group-item" style="height: 70px;padding: 16px 15px;">
+                            <div style="float:left;">
+                                <h4 class="list-group-item-heading" id="${doc.id}" title="${doc.fcontent}" data-name="${doc.fcontent}" style="width:170px;overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${doc.fcontent}</h4>
+                                <p class="list-group-item-text">正链：<span class="label label-default">${doc.frontcount}</span>&nbsp&nbsp&nbsp反链：<span class="label label-default">${doc.backcount}</span></p>
+                            </div>
+                            <div type="button" class="btn btn-default" style="float:right;"><span
+                                    class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>
+
+                        </li>`
+
+                $('#note-info').append(rr)
+            }
+        })
+    }
+
+    // 往画布里面添加节点的按钮
+    $(function () {
+        // $("#list li").parent().prev().prop("id") // 获取当前元素的父级元素的上一个
+        $("#note-info").on("click", ".btn", function () {
+            console.log("get")
+            let desc = $(this).prev().children('h4').data("name")
+            let id = $(this).prev().children('h4').prop('id')
+
+            // console.log(11,id,22,desc,)
+            addNode(graph, id, desc)
+            // getBackLinkNode(graph,id)
+        })
+    })
+
+
+    // 画布内节点左键单击显示详情
+    graph.on('node:click', (evt) => {
+        let item = evt.item
+        let target = evt.target
+        // console.log("click", item, target)
+        let id = item._cfg.id
+        Promise.all([getBlockByID(id), getDocCount(id)]).then(e => {
+            // console.log(e)
+            let name = e[0].fcontent
+            let created = e[0].created
+            let updated = e[0].updated
+            let frontLinkCount = e[1][0].frontcount
+            let backLinkCount = e[1][0].backcount
+            let rr = `<ul class="list-group">
+                            <li class="list-group-item"><h2>${name}</h2> </li>
+                            <li class="list-group-item">Id：${id}</li>
+                            <li class="list-group-item">创建时间：${created}</li>
+                            <li class="list-group-item">更新时间：${updated}</li>
+                            <li class="list-group-item">正链数&nbsp<span class="label label-default">${frontLinkCount}</span>&nbsp&nbsp反链数&nbsp<span class="label label-default">${backLinkCount}</span></li>
+                        </ul>`
+            $("#detailInfo ul").remove()
+            $("#detailInfo").append(rr)
+
+        })
+
+    })
+
+
+</script>
+
+</html>
