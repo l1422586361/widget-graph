@@ -19,10 +19,9 @@
                 <div class="panel">
                     <form class="form-inline">
                         <div class="form-group">
-                            <!-- <input type="text" class="form-control" id="exampleInputName2" placeholder="笔记本id"> -->
+
                             <input type="text" class="form-control" id="text" placeholder="关键字">
                         </div>
-                        <!-- <button type="button" class="btn btn-default" onclick="getBacklink1()">查询</button> -->
                         <button id="btnGetNode" type="button" class="btn btn-default" onclick="getNote()">查询</button>
                     </form>
                 </div>
@@ -30,23 +29,7 @@
                     <div class="panel-heading">
                         <h3 class="panel-title">信息展示</h3>
                     </div>
-                    <!-- <div class="panel-body" id="note-info"> -->
-                    <!-- 信息展示主要 -->
-                    <!-- <ul></ul> -->
-
-                    <!-- </div> -->
                     <div class="list-group" id="note-info" style="height: 700px;overflow:auto;">
-                        <!-- active -->
-                        <!-- 信息内容插入 -->
-                        <!-- <li class="list-group-item" style="height: 70px;padding: 16px 15px;">
-                            <div style="float:left;">
-                                <h4 class="list-group-item-heading" id="20211107184955-us2ys4d" data-name="test">01_Linux</h4>
-                                <p class="list-group-item-text">...</p>
-                            </div>
-                            <div type="button" class="btn btn-default" style="float:right;"><span
-                                    class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>
-
-                        </li> -->
 
                     </div>
                 </div>
@@ -215,22 +198,6 @@
         downloadAnchorNode.remove();
     }
 
-    // getBacklink1 获取反链，并进行图层渲染
-    // window.getBacklink1 = function () {
-    //     const id = '20211107184955-us2ys4d'
-
-    //     // addNode(graph, id)
-    //     getBlockByID(id).then(function (res) {
-    //         addNode(graph, id, res.content)
-    //         getBacklink(id).then(function (res) {
-    //             for (let refNode of res.backlinks) {
-    //                 addNode(graph, refNode.id, refNode.name)
-    //                 addEdge(graph, id, refNode.id)
-    //             }
-    //         })
-    //     })
-
-    // }
 
 
     // 查询关键字获取文档
