@@ -17,7 +17,7 @@ export var config = {
             // gravity: 30,
             edgeStrength: 0.8,
             nodeStrength: -200,
-            preventOverlap: true,  
+            preventOverlap: true,
             // nodeSpacing: 200,
             linkDistance: 150,
             // type: predictLayout, 智能布局推荐
@@ -48,15 +48,16 @@ export var config = {
         nodes: [],
         edges: []
     },
-    initNode: {
-        id: '',
-        label: '',
-        // x: 200,
-        // y: 150,
+    extNodeStyle: {
+        // 配色表 http://tool.c7sky.com/webcolor/
+        // 橙黄蓝分别   #FFCC99 #FFFFCC  #99CCFF
         style: {
-            fill: 'yellow',
+            fill: "#FFCC99",
+            shadowColor: "#FFCC99",
+            stroke: "#FFCC99",
         },
     },
+    queryBlockType: ['d'],  // 查询的块类型筛选，仅保留文档块，避免太多干扰信息
 }
 
 

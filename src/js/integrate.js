@@ -2,6 +2,8 @@
 // 引入模块
 
 import { getBacklink, getBlockByID, sql, fullTextSearchBlock, } from "../utils/api.js"
+import { config } from "./config.js";
+const blockType = config.queryBlockType
 
 
 // ------------ g6引擎封装函数 -----------
@@ -47,17 +49,10 @@ export async function addNode(obj, id, desc) {
 
 export async function updateNodeTo1(obj, id) {
     // 修改节点样式
-    // 配色表 http://tool.c7sky.com/webcolor/
-    // 橙黄蓝分别   #FFCC99 #FFFFCC  #99CCFF
+    
     let item = obj.findById(id)
     // console.log("updateNodeTo1",item)
-    let model = {
-        style: {
-            fill: "#FFCC99",
-            shadowColor: "#FFCC99",
-            stroke: "#FFCC99",
-        }
-    }
+    let model = config.extNodeStyle
     obj.updateItem(item,model)
 
 }
@@ -188,12 +183,13 @@ export async function getBackNodeCount(nodeid) {
 export async function getFrontLinks(nodeid) {
     // 获取正链链接
     //  sourceName sourceId targetName targetId times
+    let type = blockType.join('\',\'')
     let sqldata = `select 
     t3.content as sourceName , t3.id as sourceId , t1.content as targetName , t1.id as targetId, count(t1.id) as times
     from blocks t1
     join refs t2 on t1.id = t2.def_block_id  -- 文档id与其引用块id ，可以通过refs里的不同id字段查询blocks里的对应信息
     join blocks t3 on t3.id = t2.root_id     -- 引用块root_id 与其信息
-    where t1.type ='d' and t3.id = '${nodeid}'
+    where t1.type in ('${type}') and t3.id = '${nodeid}'
     group by t1.id,t3.id;`
     // console.log(sqldata)
     return await sql(sqldata).then(res => {
@@ -206,6 +202,7 @@ export async function getFrontLinks(nodeid) {
 export async function getDocSort(arr) {
     // 获取nodeid组，返回排序后的文档块信息列表
     let str = arr.join('\',\'')
+    let type = blockType.join('\',\'')
     // let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
     // left join (select def_block_id as id,count(root_id) as backcount from refs GROUP BY def_block_id) t2 on t1.id = t2.id
     // left join (select root_id as id,count(def_block_id) as frontcount from refs GROUP BY root_id) t3 on t1.id = t3.id
@@ -213,12 +210,12 @@ export async function getDocSort(arr) {
     // ORDER BY IFNULL(t2.backcount,0) desc,ifnull(t3.frontcount,0) desc`
     let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
     left join ( select def_block_id as id,count(root_id) as backcount from refs
- where root_id in (select id from blocks where type='d')
+ where root_id in (select id from blocks where type in ('${type}'))
   GROUP BY def_block_id) t2 on t1.id = t2.id
     left join (select root_id as id,count(def_block_id) as frontcount from refs 
-where def_block_id in (select id from blocks where type='d')
+where def_block_id in (select id from blocks where type in ('${type}'))
  GROUP BY root_id) t3 on t1.id = t3.id
-    where t1.type = 'd' and t1.id in ('${str}')
+    where t1.type in ('${type}') and t1.id in ('${str}')
     ORDER BY IFNULL(t2.backcount,0) desc,ifnull(t3.frontcount,0) desc;`
     return await sql(sqldata).then(res => {
         // console.log(res)
@@ -232,13 +229,13 @@ where def_block_id in (select id from blocks where type='d')
 
 export async function getDocCount(id) {
     // 获取nodeid组，返回排序后的文档块信息列表
-
+    let type = blockType.join('\',\'')
     let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
     left join ( select def_block_id as id,count(root_id) as backcount from refs
- where root_id in (select id from blocks where type='d')
+ where root_id in (select id from blocks where type in ('${type}'))
   GROUP BY def_block_id) t2 on t1.id = t2.id
     left join (select root_id as id,count(def_block_id) as frontcount from refs 
-where def_block_id in (select id from blocks where type='d')
+where def_block_id in (select id from blocks where type in ('${type}'))
  GROUP BY root_id) t3 on t1.id = t3.id
     where t1.type = 'd' and t1.id ='${id}';`
     return await sql(sqldata).then(res => {
