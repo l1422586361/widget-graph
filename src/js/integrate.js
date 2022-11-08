@@ -179,6 +179,19 @@ export async function getBackNodeCount(nodeid) {
 
 // ------------ 思源方法 -----------
 
+export async function getAllLinks(){
+    let type = blockType.join('\',\'')
+    let sqldata = `select t1.def_block_id as sourceId,t2.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
+    left join blocks t2 on t1.def_block_id = t2.id
+    LEFT JOIN blocks t3 on t1.root_id = t3.id
+    where t2.type in ('${type}') and t3.type in ('${type}')
+    GROUP BY t1.def_block_id,t1.root_id
+    ;`
+    return await sql(sqldata).then(res => {
+        // console.log(res)
+        return res
+    })
+}
 
 export async function getFrontLinks(nodeid) {
     // 获取正链链接
@@ -285,6 +298,7 @@ export async function getDocInfoByKey(k) {
 
 
 export async function getDocInfoByKey2(k) {
+    // 根据关键字获取doc信息
     return await fullTextSearchBlock(k).then(e => {
         let arr = []
         for (let doc of e.blocks) {

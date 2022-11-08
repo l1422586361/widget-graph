@@ -64,6 +64,7 @@
                 <div class="btn-group g6-toolbar-ul" role="group" aria-label="...">
                     <button type="file" class="btn btn-default" onclick="select_file()">导入数据</button>
                     <button type="button" class="btn btn-default" onclick='saveData()'>保存数据</button>
+                    <button type="button" class="btn btn-default" onclick='getAllLinksToGraph()'>全局关系图</button>
                     <input class="button" type="file" id="file" onchange="importData(this.files)" style="display:none" />
                 </div>
             </div>
@@ -102,7 +103,7 @@
 <script type="module">
     import { config, } from "./src/js/config.js"
     import { getBacklink, getBlockByID, } from "./src/utils/api.js"
-    import { addEdge, addNode,updateNodeTo1, hasEdge, getBackNodeCount, getFrontLinks, getDocInfoByKey, delNodeEdge,getDocInfoByKey2,getDocCount, } from "./src/js/integrate.js"
+    import { addEdge, addNode,updateNodeTo1, hasEdge, getBackNodeCount, getFrontLinks, getDocInfoByKey, delNodeEdge,getDocInfoByKey2,getDocCount,getAllLinks, } from "./src/js/integrate.js"
 
 
 
@@ -184,6 +185,33 @@
     config.forceGraph.plugins = [menu]
     const graph = new G6.Graph(config.forceGraph);
     graph.read(config.data)
+
+
+    // 展示全局关系图
+    window.getAllLinksToGraph = function(){
+        let graphData = config.data
+        getAllLinks().then(e =>{
+            console.log(e)
+            for (let link of e){
+                let sourceNode = { id: link.sourceId, label: link.sourceDesc }
+                let targetNode = { id: link.targetId, label: link.targetDesc }
+                let edge =  { source: link.sourceId, target: link.targetId }
+                if (JSON.stringify(graphData.nodes).indexOf(JSON.stringify(sourceNode)) === -1){
+                    graphData.nodes.push(sourceNode)
+                }
+                if (JSON.stringify(graphData.nodes).indexOf(JSON.stringify(targetNode)) === -1){
+                    graphData.nodes.push(targetNode)
+                }
+                if (JSON.stringify(graphData.edges).indexOf(JSON.stringify(edge)) === -1){
+                    graphData.edges.push(edge)
+                }
+            }
+            console.log(graphData)
+            graph.read(graphData)
+        })
+    }
+
+
 
     // 上传文件/导入数据
     window.select_file = function (){

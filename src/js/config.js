@@ -5,8 +5,8 @@ export var config = {
         container: '', // String | HTMLElement，必须，在 Step 1 中创建的容器 id 或容器本身
         width: 1000, // Number，必须，图的宽度
         height: 500, // Number，必须，图的高度
-        // fitView: true,
-        // fitViewPadding: [20, 40, 50, 20],
+        fitView: true,
+        fitViewPadding: [20, 40, 50, 20],
         // workerEnabled: true,
         // plugins: [menu],
         layout: {
