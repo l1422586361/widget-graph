@@ -131,11 +131,13 @@ window.getAllLinksToGraph = function () {
             }
             // 定义节点大小
             if (node.value <= 10) {
-                node.size = 40;
+                node.size = 20;
             } else if (node.value <= 20) {
-                node.size = 60;
+                node.size = 40;
             } else if (node.value > 20) {
                 node.size = 80;
+            }else{
+                node.size = 10
             }
         }
         console.log(2, graphData)

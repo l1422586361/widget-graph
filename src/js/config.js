@@ -16,11 +16,11 @@ export var config = {
             // gravity: 30,
             edgeStrength: 0.8,
             // nodeStrength: -200,
-            // nodeStrength: (d) => {
-            //     if (d.isLeaf){
-            //         return -50;
-            //     }return -200;
-            // },
+            nodeStrength: (d) => {
+                if (d.isLeaf){
+                    return -50;
+                }return -200;
+            },
             preventOverlap: true,
             // nodeSpacing: 200,
             linkDistance: 150,
