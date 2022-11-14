@@ -48,9 +48,12 @@ export var config = {
             default: ['drag-canvas', 'zoom-canvas', 'click-select', 'drag-node', 'activate-relations'],
         }
     },
+    ignoreNote: ['20211104180818-u19xi5t'], // 全局关系图忽略笔记
+    ignoteNoteBook: [], // 全局关系图忽略笔记本,没实装
     data: {
         nodes: [],
-        edges: []
+        edges: [],
+        combos: []
     },
     extNodeStyle: {
         // 配色表 http://tool.c7sky.com/webcolor/

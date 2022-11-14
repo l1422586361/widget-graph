@@ -181,10 +181,11 @@ export async function getBackNodeCount(nodeid) {
 
 export async function getAllLinks(){
     let type = blockType.join('\',\'')
-    let sqldata = `select t1.def_block_id as sourceId,t2.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
+    let ignoreNote = config.ignoreNote.join('\',\'')
+    let sqldata = `select t2.box as sourceBox,t3.box as targetBox,t1.def_block_id as sourceId,t2.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
     left join blocks t2 on t1.def_block_id = t2.id
     LEFT JOIN blocks t3 on t1.root_id = t3.id
-    where t2.type in ('${type}') and t3.type in ('${type}')
+    where t2.type in ('${type}') and t3.type in ('${type}') and t1.def_block_id not in ('${ignoreNote}') and t1.root_id not in ('${ignoreNote}')
     GROUP BY t1.def_block_id,t1.root_id
     ;`
     return await sql(sqldata).then(res => {

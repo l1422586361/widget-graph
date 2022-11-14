@@ -56,15 +56,15 @@ const menu = new G6.Menu({
                 updateNodeTo1(graph, item._cfg.id)
                 getBacklink(item._cfg.id).then(res => {
                     // console.log("test", res)
-                    if(res.linkRefsCount != 0){
+                    if (res.linkRefsCount != 0) {
                         for (let refNode of res.backlinks) {
                             addNode(graph, refNode.id, refNode.name)
                             // addEdge(graph, id,refNode.id)
                             addEdge(graph, refNode.id, id)
-    
+
                         }
                     }
-                    
+
 
 
                 })
@@ -95,7 +95,7 @@ config.forceGraph.plugins = [menu]
 const graph = new G6.Graph(config.forceGraph);
 graph.read(config.data)
 
-window.refreshGraph = function(){
+window.refreshGraph = function () {
     graph.layout();
 }
 
@@ -134,13 +134,13 @@ window.getAllLinksToGraph = function () {
                 node.isLeaf = true
             }
             // 定义节点大小
-            if (node.value <= 10) {
+            if (node.value <= 5) {
                 node.size = 20;
             } else if (node.value <= 20) {
                 node.size = 40;
             } else if (node.value > 20) {
                 node.size = 80;
-            }else{
+            } else {
                 node.size = 10
             }
         }
