@@ -34,11 +34,16 @@ const menu = new G6.Menu({
                 // 添加所有关系
                 updateNodeTo1(graph, item._cfg.id)
                 Promise.all([getBacklink(item._cfg.id), getFrontLinks(item._cfg.id)]).then(e => {
-                    for (let refNode of e[0].backlinks) {
-                        addNode(graph, refNode.id, refNode.name)
-                        // addEdge(graph, id,refNode.id)
-                        addEdge(graph, refNode.id, id)
+                    // console.log("反链", e[0])
+                    if (e[0].linkRefsCount != 0) {
+                        console.log(1111)
+                        for (let refNode of e[0].backlinks) {
+                            addNode(graph, refNode.id, refNode.name)
+                            // addEdge(graph, id,refNode.id)
+                            addEdge(graph, refNode.id, id)
+                        }
                     }
+
                     for (let refNode of e[1]) {
                         addNode(graph, refNode.targetId, refNode.targetName)
                         // addEdge(graph, id,refNode.id)
@@ -51,21 +56,24 @@ const menu = new G6.Menu({
                 updateNodeTo1(graph, item._cfg.id)
                 getBacklink(item._cfg.id).then(res => {
                     // console.log("test", res)
-                    let i = 0
-                    for (let refNode of res.backlinks) {
-                        addNode(graph, refNode.id, refNode.name)
-                        // addEdge(graph, id,refNode.id)
-                        addEdge(graph, refNode.id, id)
-                        i += 1
-
+                    if(res.linkRefsCount != 0){
+                        for (let refNode of res.backlinks) {
+                            addNode(graph, refNode.id, refNode.name)
+                            // addEdge(graph, id,refNode.id)
+                            addEdge(graph, refNode.id, id)
+    
+                        }
                     }
+                    
+
+
                 })
                 break;
             case "addFrontlink":
                 // 添加正链
                 updateNodeTo1(graph, item._cfg.id)
                 getFrontLinks(item._cfg.id).then(res => {
-                    console.log("test", res)
+                    // console.log("test", res)
                     for (let refNode of res) {
                         addNode(graph, refNode.targetId, refNode.targetName)
                         // addEdge(graph, id,refNode.id)
@@ -107,30 +115,30 @@ window.getAllLinksToGraph = function () {
                 graphData.edges.push(edge)
             }
         }
-        console.log(1,graphData)
+        console.log(1, graphData)
         // 基于节点边的数量，添加样式
-        for (let node of graphData.nodes){
+        for (let node of graphData.nodes) {
             let i = 0
-            for (let edge of graphData.edges){
-                if (edge.source == node.id || edge.target == node.id){
-                // if (edge.source == node.id){ // 使用反链来统计
-                    i+=1
+            for (let edge of graphData.edges) {
+                if (edge.source == node.id || edge.target == node.id) {
+                    // if (edge.source == node.id){ // 使用反链来统计
+                    i += 1
                 }
             }
             node.value = i
-            if (node.value<=5){
+            if (node.value <= 5) {
                 node.isLeaf = true
             }
             // 定义节点大小
-           if (node.value <= 10){
+            if (node.value <= 10) {
                 node.size = 40;
-            }else if (node.value <=20){
-                node.size =60;
-            }else if (node.value > 20){
+            } else if (node.value <= 20) {
+                node.size = 60;
+            } else if (node.value > 20) {
                 node.size = 80;
             }
         }
-        console.log(2,graphData)
+        console.log(2, graphData)
         // graph.read(graphData)
         graph.changeData(graphData)
     })
@@ -163,9 +171,9 @@ window.getAllLinksToGraph = function () {
 //   ---------------------------------------------
 
 function refreshDragedNodePosition(e) {
-  const model = e.item.get('model');
-  model.fx = e.x;
-  model.fy = e.y;
+    const model = e.item.get('model');
+    model.fx = e.x;
+    model.fy = e.y;
 }
 
 
