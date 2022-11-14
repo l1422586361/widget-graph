@@ -95,6 +95,10 @@ config.forceGraph.plugins = [menu]
 const graph = new G6.Graph(config.forceGraph);
 graph.read(config.data)
 
+window.refreshGraph = function(){
+    graph.layout();
+}
+
 
 // 展示全局关系图
 window.getAllLinksToGraph = function () {
