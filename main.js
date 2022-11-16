@@ -1,6 +1,6 @@
 import { config, } from "./src/js/config.js"
 import { getBacklink, getBlockByID, } from "./src/utils/api.js"
-import { addEdge, addNode, updateNodeTo1, hasEdge, getBackNodeCount, getFrontLinks, getDocInfoByKey, delNodeEdge, getDocInfoByKey2, getDocCount, getAllLinks, } from "./src/js/integrate.js"
+import { addEdge, addNode, updateNodeTo1, hasEdge, getBackNodeCount, getFrontLinks, getDocInfoByKey, delNodeEdge, getDocInfoByKey2, getDocCount, getAllLinks, getAllNoteByIdToGraph, getAllLinksByid, } from "./src/js/integrate.js"
 
 
 
@@ -33,23 +33,24 @@ const menu = new G6.Menu({
             case "addAll":
                 // 添加所有关系
                 updateNodeTo1(graph, item._cfg.id)
-                Promise.all([getBacklink(item._cfg.id), getFrontLinks(item._cfg.id)]).then(e => {
-                    // console.log("反链", e[0])
-                    if (e[0].linkRefsCount != 0) {
-                        console.log(1111)
-                        for (let refNode of e[0].backlinks) {
-                            addNode(graph, refNode.id, refNode.name)
-                            // addEdge(graph, id,refNode.id)
-                            addEdge(graph, refNode.id, id)
-                        }
-                    }
+                // Promise.all([getBacklink(item._cfg.id), getFrontLinks(item._cfg.id)]).then(e => {
+                //     // console.log("反链", e[0])
+                //     if (e[0].linkRefsCount != 0) {
+                //         console.log(1111)
+                //         for (let refNode of e[0].backlinks) {
+                //             addNode(graph, refNode.id, refNode.name)
+                //             // addEdge(graph, id,refNode.id)
+                //             addEdge(graph, refNode.id, id)
+                //         }
+                //     }
 
-                    for (let refNode of e[1]) {
-                        addNode(graph, refNode.targetId, refNode.targetName)
-                        // addEdge(graph, id,refNode.id)
-                        addEdge(graph, id, refNode.targetId)
-                    }
-                })
+                //     for (let refNode of e[1]) {
+                //         addNode(graph, refNode.targetId, refNode.targetName)
+                //         // addEdge(graph, id,refNode.id)
+                //         addEdge(graph, id, refNode.targetId)
+                //     }
+                // })
+                getAllNoteByIdToGraph(graph, item._cfg.id)
             case "addBacklink":
                 // 添加反链
                 // console.log("addBacklink",item)
@@ -176,11 +177,11 @@ window.getAllLinksToGraph = function () {
 
 //   ---------------------------------------------
 
-function refreshDragedNodePosition(e) {
-    const model = e.item.get('model');
-    model.fx = e.x;
-    model.fy = e.y;
-}
+// function refreshDragedNodePosition(e) {
+//     const model = e.item.get('model');
+//     model.fx = e.x;
+//     model.fy = e.y;
+// }
 
 
 
@@ -258,34 +259,247 @@ window.getNote = function () {
         $("#note-info h5").remove()
         for (let doc of e) {
             // console.log("get",e.id)
-            let rr = `<li class="list-group-item" style="height: 70px;padding: 16px 15px;">
-                            <div style="float:left;">
-                                <h4 class="list-group-item-heading" id="${doc.id}" title="${doc.fcontent}" data-name="${doc.fcontent}" style="width:170px;overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${doc.fcontent}</h4>
-                                <p class="list-group-item-text">正链：<span class="label label-default">${doc.frontcount}</span>&nbsp&nbsp&nbsp反链：<span class="label label-default">${doc.backcount}</span></p>
-                            </div>
-                            <div type="button" class="btn btn-default" style="float:right;"><span
-                                    class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>
+            // let rr = `<li class="list-group-item" style="height: 70px;padding: 16px 15px;">
+            //                 <div style="float:left;">
+            //                     <h4 class="list-group-item-heading" id="${doc.id}" title="${doc.fcontent}" data-name="${doc.fcontent}" style="width:170px;overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${doc.fcontent}</h4>
+            //                     <p class="list-group-item-text">正链：<span class="label label-default">${doc.frontcount}</span>&nbsp&nbsp&nbsp反链：<span class="label label-default">${doc.backcount}</span></p>
+            //                 </div>
+            //                 <div type="button" class="btn btn-default" style="float:right;"><span
+            //                         class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>
 
-                        </li>`
+            //             </li>`
+
+            let rr = `<div class="list-group-item" style="height: 70px;padding: 16px 15px;">
+                        <div style="float:left;">
+                            <h4 class="list-group-item-heading" id="${doc.id}" title="${doc.fcontent}" data-name="${doc.fcontent}" style="width:170px;overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${doc.fcontent}</h4>
+                            <p class="list-group-item-text">正链：<span class="label label-default">${doc.frontcount}</span>&nbsp&nbsp&nbsp反链：<span class="label label-default">${doc.backcount}</span></p>
+                        </div>
+                        <!-- 按钮下拉菜单 -->
+                        <div class="dropdown" style="float:right;">
+                            <button id="dLabel" type="button" class="dropdown-toggle btn btn-default glyphicon glyphicon-plus"
+                                aria-hidden="true" data-toggle="dropdown" aria-haspopup="false"
+                                aria-expanded="false"></button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"
+                                style="position:absolute;left: -120px;top: 32px;" >
+                                <li role="presentation"><a role="menuitem" tabindex="-1">添加节点</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1">扩展一度关系笔记</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1">扩展二度关系笔记</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1">扩展三度关系笔记</a></li>
+                            </ul>
+                        </div>
+
+                    </div>`
 
             $('#note-info').append(rr)
         }
     })
 }
 
-// 往画布里面添加节点的按钮
+// 往画布里面添加节点的按钮(+号按钮)
 $(function () {
     // $("#list li").parent().prev().prop("id") // 获取当前元素的父级元素的上一个
-    $("#note-info").on("click", ".btn", function () {
+    $("#note-info").on("click", "a", function () {
         console.log("get")
-        let desc = $(this).prev().children('h4').data("name")
-        let id = $(this).prev().children('h4').prop('id')
+        let desc = $(this).parent().parent().parent().prev().children('h4').data("name")
+        // let desc = $(this).prev().children('h4').data("name")
+        let id = $(this).parent().parent().parent().prev().children('h4').prop('id')
+        // let id = $(this).prev().children('h4').prop('id')
+        let title = $(this).text()
+        // let data = graph.save()
+        // let nodes = data.nodes.map(e => { return { id: e.id, label: e.label } })
+        // let edges = data.edges.map(e => { return { source: e.source, target: e.target } })
+        // console.log(11, id, 22, desc, title)
+        switch (title) {
+            case "添加节点":
+                addNode(graph, id, desc);
+                break;
+            case "扩展一度关系笔记":
+                data = graph.save()
+                nodes = data.nodes.map(e => { return { id: e.id, label: e.label } })
+                edges = data.edges.map(e => { return { source: e.source, target: e.target } })
+                console.log(data)
+                getAllLinks(id).then(e => {
+                    console.log(e)
+                    e.forEach(e1 => {
+                        setArrToJson(e1, nodes, edges)
+                    })
+                    data.nodes = nodes
+                    data.edges = edges
+                    graph.changeData(data)
+                })
+                break;
+            case "扩展二度关系笔记":
+                (async function () {
+                    let nodes = []
+                    let edges = []
+                    let res1 = await getAllLinks(id)
+                    for (let e1 of res1) {
+                        setArrToJson(e1, nodes, edges)
+                        if (e1.sourceId != id) {
+                            let res2 = await getAllLinks(e1.sourceId)
+                            for (let e2 of res2) {
+                                setArrToJson(e2, nodes, edges)
+                            }
+                        }
+                        if (e1.targetId != id) {
+                            let res2 = await getAllLinks(e1.targetId)
+                            for (let e2 of res2) {
+                                setArrToJson(e2, nodes, edges)
+                            }
+                        }
+                    }
+                    console.log(nodes, edges)
+                    let data = graph.save()
+                    let allNodes = data.nodes.map(e => { return { id: e.id } })
+                    let allEdges = data.edges.map(e => { return { source: e.source, target: e.target } })
+                    console.log(122, allNodes, allEdges)
+                    for (let node of nodes) {
+                        if (allNodes.map(e => { return e.id }).indexOf(node.id) === -1) {
+                            // console.log(allNodes.map(e=>{return e.id}),node.id)
+                            allNodes.push(node)
+                        }
+                    }
+                    for (let edge of edges) {
+                        if (allEdges.map(e => { return { source: e.source, target: e.target } }).indexOf({ source: edge.source, target: edge.target }) === -1) {
+                            // console.log(allEdges.map(e=>{return { source: e.source, target: e.target }}),{source: edge.source, target: edge.target })
+                            allEdges.push(edge)
+                        }
+                    }
+                    data.nodes = allNodes; data.edges = allEdges
+                    console.log(data)
+                    graph.changeData(data)
+                })()
 
-        // console.log(11,id,22,desc,)
-        addNode(graph, id, desc)
+
+
+                break;
+            case "扩展三度关系笔记":
+                (async function () {
+                    let nodes = []
+                    let edges = []
+                    let res1 = await getAllLinks(id)
+                    for (let e1 of res1) {
+                        setArrToJson(e1, nodes, edges)
+                        if (e1.sourceId != id) {
+                            let res2 = await getAllLinks(e1.sourceId)
+                            for (let e2 of res2) {
+                                setArrToJson(e2, nodes, edges)
+                                if (e2.sourceId != e1.sourceId) {
+                                    let res3 = await getAllLinks(e2.sourceId)
+                                    for (let e3 of res3) {
+                                        setArrToJson(e3, nodes, edges)
+                                    }
+                                }
+                                if (e2.targetId != e1.sourceId) {
+                                    let res3 = await getAllLinks(e2.targetId)
+                                    for (let e3 of res3) {
+                                        setArrToJson(e3, nodes, edges)
+                                    }
+                                }
+                            }
+                        }
+                        if (e1.targetId != id) {
+                            let res2 = await getAllLinks(e1.targetId)
+                            for (let e2 of res2) {
+                                setArrToJson(e2, nodes, edges)
+                                if (e2.sourceId != e1.targetId) {
+                                    let res3 = await getAllLinks(e2.sourceId)
+                                    for (let e3 of res3) {
+                                        setArrToJson(e3, nodes, edges)
+                                    }
+                                }
+                                if (e2.targetId != e1.targetId) {
+                                    let res3 = await getAllLinks(e2.targetId)
+                                    for (let e3 of res3) {
+                                        setArrToJson(e3, nodes, edges)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    console.log(nodes, edges)
+                    let data = graph.save()
+                    let allNodes = data.nodes.map(e => { return { id: e.id } })
+                    let allEdges = data.edges.map(e => { return { source: e.source, target: e.target } })
+                    console.log(122, allNodes, allEdges)
+                    for (let node of nodes) {
+                        if (allNodes.map(e => { return e.id }).indexOf(node.id) === -1) {
+                            // console.log(allNodes.map(e=>{return e.id}),node.id)
+                            allNodes.push(node)
+                        }
+                    }
+                    for (let edge of edges) {
+                        if (allEdges.map(e => { return { source: e.source, target: e.target } }).indexOf({ source: edge.source, target: edge.target }) === -1) {
+                            // console.log(allEdges.map(e=>{return { source: e.source, target: e.target }}),{source: edge.source, target: edge.target })
+                            allEdges.push(edge)
+                        }
+                    }
+                    data.nodes = allNodes; data.edges = allEdges
+                    console.log(data)
+                    graph.changeData(data)
+                })()
+
+                break;
+        }
         // getBackLinkNode(graph,id)
     })
 })
+
+
+async function getAllLinksByid2(id) {
+    let data = config.data
+    data = await getAllLinks(id).then(e => {
+        e.forEach(e1 => {
+            let node1 = { id: e1.sourceId, label: e1.sourceDesc }
+            let node2 = { id: e1.targetId, label: e1.targetDesc }
+            let edge = { source: e1.sourceId, target: e1.targetId }
+            if (node1.id) {
+                if (JSON.stringify(data.nodes).indexOf(JSON.stringify(node1)) === -1) {
+                    data.nodes.push(node1)
+                }
+            }
+            if (node2.id) {
+                if (JSON.stringify(data.nodes).indexOf(JSON.stringify(node2)) === -1) {
+                    data.nodes.push(node2)
+                }
+            }
+            if (edge.source) {
+                if (JSON.stringify(data.edges).indexOf(JSON.stringify(edge)) === -1) {
+                    data.edges.push(edge)
+                }
+            }
+        })
+
+        return data
+    })
+}
+
+
+function setArrToJson(arr, nodes, edges) {
+    let node1 = { id: arr.sourceId, label: arr.sourceDesc }
+    let node2 = { id: arr.targetId, label: arr.targetDesc }
+    let edge = { source: arr.sourceId, target: arr.targetId }
+    // console.log(1111, node1, node2, edge)
+    if (node1.id) {
+        if (JSON.stringify(nodes).indexOf(JSON.stringify(node1)) === -1) {
+            nodes.push(node1)
+        }
+    }
+    if (node2.id) {
+        if (JSON.stringify(nodes).indexOf(JSON.stringify(node2)) === -1) {
+            nodes.push(node2)
+        }
+    }
+    if (edge.source) {
+        if (JSON.stringify(edges).indexOf(JSON.stringify(edge)) === -1) {
+            edges.push(edge)
+        }
+    }
+    // return nodes,edges
+
+}
+
+
 
 
 // 画布内节点左键单击显示详情

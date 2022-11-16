@@ -179,15 +179,73 @@ export async function getBackNodeCount(nodeid) {
 
 // ------------ 思源方法 -----------
 
-export async function getAllLinks(){
+export async function getAllLinksByid(id){
+    // 基于文档id获取关系，返回数组
+    // 遍历方法来扩展，效果不佳
+    let links = [];
+    return Promise.all([getBacklink(id), getFrontLinks(id)]).then(e => {
+        // console.log("反链", e[0])
+        if (e[0].linkRefsCount != 0) {
+            // console.log(1111)
+            for (let refNode of e[0].backlinks) {
+                links.push({id:refNode.id,name:refNode.name})
+            }
+        }
+
+        for (let refNode of e[1]) {
+            links.push({id:refNode.targetId,name:refNode.targetName})
+        }
+        // console.log(links)
+        return links
+    })
+}
+
+
+export async function getAllNoteByIdToGraph(obj,id){
+    // 基于文档id获取所有关系并渲染到画布上
+    Promise.all([getBacklink(id), getFrontLinks(id)]).then(e => {
+        // console.log("反链", e[0])
+        if (e[0].linkRefsCount != 0) {
+            // console.log(1111)
+            for (let refNode of e[0].backlinks) {
+                addNode(obj, refNode.id, refNode.name)
+                // addEdge(graph, id,refNode.id)
+                addEdge(obj, refNode.id, id)
+            }
+        }
+
+        for (let refNode of e[1]) {
+            addNode(obj, refNode.targetId, refNode.targetName)
+            // addEdge(graph, id,refNode.id)
+            addEdge(obj, id, refNode.targetId)
+        }
+    })
+}
+
+const ignoreNote = config.ignoreNote.join('\',\'')
+
+export async function getAllLinks(id){
+    // 加id获取所有基于id的note
+    // 不加id获取全局关系
     let type = blockType.join('\',\'')
-    let ignoreNote = config.ignoreNote.join('\',\'')
+    let 条件 = ''
+    // let ignoreNote = config.ignoreNote.join('\',\'')
+    if (id){
+        条件 = `and (t1.def_block_id = '${id}' or t1.root_id = '${id}')`
+    }
+    if (type){
+        条件 += `and t2.type in ('${type}') and t3.type in ('${type}')`
+    }
+    if (ignoreNote){
+        条件 += `and t1.def_block_id not in ('${ignoreNote}') and t1.root_id not in ('${ignoreNote}')`
+    }
     let sqldata = `select t2.box as sourceBox,t3.box as targetBox,t1.def_block_id as sourceId,t2.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
     left join blocks t2 on t1.def_block_id = t2.id
     LEFT JOIN blocks t3 on t1.root_id = t3.id
-    where t2.type in ('${type}') and t3.type in ('${type}') and t1.def_block_id not in ('${ignoreNote}') and t1.root_id not in ('${ignoreNote}')
+    where  1=1 ${条件}
     GROUP BY t1.def_block_id,t1.root_id
     ;`
+    // console.log(sqldata)
     return await sql(sqldata).then(res => {
         // console.log(res)
         return res

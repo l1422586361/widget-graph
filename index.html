@@ -20,11 +20,13 @@
                     <form class="form-inline">
                         <div class="form-group">
                             <!-- <input type="text" class="form-control" id="exampleInputName2" placeholder="笔记本id"> -->
-                            <input type="text" class="form-control" id="text" placeholder="关键字" onkeydown="if(event.keyCode==13){return false}">
-                            <button id="btnGetNode" type="button" class="btn btn-default" onclick="getNote()">查询</button>
+                            <input type="text" class="form-control" id="text" placeholder="关键字"
+                                onkeydown="if(event.keyCode==13){return false}">
+                            <button id="btnGetNode" type="button" class="btn btn-default"
+                                onclick="getNote()">查询</button>
                         </div>
                         <!-- <button type="button" class="btn btn-default" onclick="getBacklink1()">查询</button> -->
-                        
+
                     </form>
                 </div>
                 <div class="panel panel-default">
@@ -39,15 +41,31 @@
                     <div class="list-group" id="note-info" style="height: 700px;overflow:auto;">
                         <!-- active -->
                         <!-- 信息内容插入 -->
-                        <!-- <li class="list-group-item" style="height: 70px;padding: 16px 15px;">
+                        <!-- <div class="list-group-item" style="height: 70px;padding: 16px 15px;">
                             <div style="float:left;">
-                                <h4 class="list-group-item-heading" id="20211107184955-us2ys4d" data-name="test">01_Linux</h4>
+                                <h4 class="list-group-item-heading" id="20211107184955-us2ys4d" data-name="test1">
+                                    01_Linux</h4>
                                 <p class="list-group-item-text">...</p>
+                            </div> -->
+                            <!-- 按钮下拉菜单 -->
+                            <!-- <div class="dropdown" style="float:right;">
+                                <button id="dLabel" type="button" class="dropdown-toggle btn btn-default glyphicon glyphicon-plus"
+                                    aria-hidden="true" data-toggle="dropdown" aria-haspopup="false"
+                                    aria-expanded="false"></button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"
+                                    style="position:absolute;left: -120px;top: 32px;z-index: 9999;" >
+                                    <li role="presentation"><a role="menuitem" tabindex="-1">添加节点</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1">扩展一度关系笔记</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1">扩展二度关系笔记</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1">扩展三度关系笔记</a></li>
+                                </ul>
                             </div>
-                            <div type="button" class="btn btn-default" style="float:right;"><span
-                                    class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>
 
-                        </li> -->
+                        </div> -->
+                        
+                        
+
+
 
                     </div>
                 </div>
@@ -67,7 +85,8 @@
                     <button type="button" class="btn btn-default" onclick='saveData()'>保存数据</button>
                     <button type="button" class="btn btn-default" onclick='getAllLinksToGraph()'>全局关系图</button>
                     <button type="button" class="btn btn-default" onclick='refreshGraph()'>刷新画布布局</button>
-                    <input class="button" type="file" id="file" onchange="importData(this.files)" style="display:none" />
+                    <input class="button" type="file" id="file" onchange="importData(this.files)"
+                        style="display:none" />
                 </div>
             </div>
             <!-- 右栏 -->
