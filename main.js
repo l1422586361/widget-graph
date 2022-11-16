@@ -314,19 +314,34 @@ $(function () {
                 addNode(graph, id, desc);
                 break;
             case "扩展一度关系笔记":
-                data = graph.save()
-                nodes = data.nodes.map(e => { return { id: e.id, label: e.label } })
-                edges = data.edges.map(e => { return { source: e.source, target: e.target } })
-                console.log(data)
-                getAllLinks(id).then(e => {
-                    console.log(e)
-                    e.forEach(e1 => {
+                (async function () {
+                    let nodes = []
+                    let edges = []
+                    let res1 = await getAllLinks(id)
+                    for (let e1 of res1) { // 第一层
                         setArrToJson(e1, nodes, edges)
-                    })
-                    data.nodes = nodes
-                    data.edges = edges
+                    }
+                    console.log(nodes, edges)
+                    let data = graph.save()
+                    let allNodes = data.nodes.map(e => { return { id: e.id } })
+                    let allEdges = data.edges.map(e => { return { source: e.source, target: e.target } })
+                    // console.log(122, allNodes, allEdges)
+                    for (let node of nodes) {
+                        if (allNodes.map(e => { return e.id }).indexOf(node.id) === -1) {
+                            // console.log(allNodes.map(e=>{return e.id}),node.id)
+                            allNodes.push(node)
+                        }
+                    }
+                    for (let edge of edges) {
+                        if (allEdges.map(e => { return JSON.stringify({ source: e.source, target: e.target }) }).indexOf(JSON.stringify({ source: edge.source, target: edge.target })) === -1) {
+                            // console.log(allEdges.map(e=>{return { source: e.source, target: e.target }}),{source: edge.source, target: edge.target })
+                            allEdges.push(edge)
+                        }
+                    }
+                    data.nodes = allNodes; data.edges = allEdges
+                    console.log(data)
                     graph.changeData(data)
-                })
+                })()
                 break;
             case "扩展二度关系笔记":
                 (async function () {
@@ -335,7 +350,7 @@ $(function () {
                     let res1 = await getAllLinks(id)
                     for (let e1 of res1) { // 第一层
                         setArrToJson(e1, nodes, edges)
-                        if (e1.sourceId != id) { 
+                        if (e1.sourceId != id) {
                             let res2 = await getAllLinks(e1.sourceId)
                             for (let e2 of res2) { // 第二层
                                 setArrToJson(e2, nodes, edges)
@@ -352,7 +367,7 @@ $(function () {
                     let data = graph.save()
                     let allNodes = data.nodes.map(e => { return { id: e.id } })
                     let allEdges = data.edges.map(e => { return { source: e.source, target: e.target } })
-                    console.log(122, allNodes, allEdges)
+                    // console.log(122, allNodes, allEdges)
                     for (let node of nodes) {
                         if (allNodes.map(e => { return e.id }).indexOf(node.id) === -1) {
                             // console.log(allNodes.map(e=>{return e.id}),node.id)
@@ -360,7 +375,7 @@ $(function () {
                         }
                     }
                     for (let edge of edges) {
-                        if (allEdges.map(e => { return { source: e.source, target: e.target } }).indexOf({ source: edge.source, target: edge.target }) === -1) {
+                        if (allEdges.map(e => { return JSON.stringify({ source: e.source, target: e.target }) }).indexOf(JSON.stringify({ source: edge.source, target: edge.target })) === -1) {
                             // console.log(allEdges.map(e=>{return { source: e.source, target: e.target }}),{source: edge.source, target: edge.target })
                             allEdges.push(edge)
                         }
@@ -429,7 +444,7 @@ $(function () {
                         }
                     }
                     for (let edge of edges) {
-                        if (allEdges.map(e => { return { source: e.source, target: e.target } }).indexOf({ source: edge.source, target: edge.target }) === -1) {
+                        if (allEdges.map(e => { return JSON.stringify({ source: e.source, target: e.target }) }).indexOf(JSON.stringify({ source: edge.source, target: edge.target })) === -1) {
                             // console.log(allEdges.map(e=>{return { source: e.source, target: e.target }}),{source: edge.source, target: edge.target })
                             allEdges.push(edge)
                         }
@@ -503,3 +518,36 @@ graph.on('node:click', (evt) => {
     })
 
 })
+
+
+// 超级节点高亮
+
+
+window.getSuperNode = function () {
+    // 对edges去重
+    let data = graph.save()
+    let nodes = data.nodes.map(e => { return { id: e.id, label: e.label } })
+    for (let node of nodes) {
+        let e = graph.getNodeDegree(node.id, 'all')
+
+        // 定义节点大小
+        if (e.degree <= 5) {
+            node.size = 20;
+        } else if (e.degree <= 20) {
+            node.size = 40;
+            node.style = config.superNodeStyle.style
+        } else if (e.degree > 20) {
+            node.size = 80;
+            node.style = config.superNodeStyle.style
+        } else {
+            node.size = 10
+            node.isLeaf = true
+        }
+    }
+    // console.log(nodes)
+    data.nodes = nodes
+    graph.changeData(data)
+
+    // console.log(e,e2)
+}
+

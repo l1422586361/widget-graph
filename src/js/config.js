@@ -64,6 +64,13 @@ export var config = {
             stroke: "#FFCC99",
         },
     },
+    superNodeStyle: {
+        style: {
+            fill: "#FF9999",
+            shadowColor: "#FF9999",
+            stroke: "#FF9999",
+        },
+    },
     queryBlockType: ['d'],  // 查询的块类型筛选，仅保留文档块，避免太多干扰信息
 }
 
