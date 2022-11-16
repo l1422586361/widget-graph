@@ -333,17 +333,17 @@ $(function () {
                     let nodes = []
                     let edges = []
                     let res1 = await getAllLinks(id)
-                    for (let e1 of res1) {
+                    for (let e1 of res1) { // 第一层
                         setArrToJson(e1, nodes, edges)
-                        if (e1.sourceId != id) {
+                        if (e1.sourceId != id) { 
                             let res2 = await getAllLinks(e1.sourceId)
-                            for (let e2 of res2) {
+                            for (let e2 of res2) { // 第二层
                                 setArrToJson(e2, nodes, edges)
                             }
                         }
                         if (e1.targetId != id) {
                             let res2 = await getAllLinks(e1.targetId)
-                            for (let e2 of res2) {
+                            for (let e2 of res2) { // 第二层
                                 setArrToJson(e2, nodes, edges)
                             }
                         }
@@ -378,21 +378,21 @@ $(function () {
                     let nodes = []
                     let edges = []
                     let res1 = await getAllLinks(id)
-                    for (let e1 of res1) {
+                    for (let e1 of res1) {  // 第一层
                         setArrToJson(e1, nodes, edges)
                         if (e1.sourceId != id) {
                             let res2 = await getAllLinks(e1.sourceId)
-                            for (let e2 of res2) {
+                            for (let e2 of res2) { // 第二层
                                 setArrToJson(e2, nodes, edges)
                                 if (e2.sourceId != e1.sourceId) {
                                     let res3 = await getAllLinks(e2.sourceId)
-                                    for (let e3 of res3) {
+                                    for (let e3 of res3) { // 第三层
                                         setArrToJson(e3, nodes, edges)
                                     }
                                 }
                                 if (e2.targetId != e1.sourceId) {
                                     let res3 = await getAllLinks(e2.targetId)
-                                    for (let e3 of res3) {
+                                    for (let e3 of res3) { // 第三层
                                         setArrToJson(e3, nodes, edges)
                                     }
                                 }
@@ -400,17 +400,17 @@ $(function () {
                         }
                         if (e1.targetId != id) {
                             let res2 = await getAllLinks(e1.targetId)
-                            for (let e2 of res2) {
+                            for (let e2 of res2) {  // 第二层
                                 setArrToJson(e2, nodes, edges)
                                 if (e2.sourceId != e1.targetId) {
                                     let res3 = await getAllLinks(e2.sourceId)
-                                    for (let e3 of res3) {
+                                    for (let e3 of res3) { // 第三层
                                         setArrToJson(e3, nodes, edges)
                                     }
                                 }
                                 if (e2.targetId != e1.targetId) {
                                     let res3 = await getAllLinks(e2.targetId)
-                                    for (let e3 of res3) {
+                                    for (let e3 of res3) { // 第三层
                                         setArrToJson(e3, nodes, edges)
                                     }
                                 }
@@ -446,33 +446,6 @@ $(function () {
 })
 
 
-async function getAllLinksByid2(id) {
-    let data = config.data
-    data = await getAllLinks(id).then(e => {
-        e.forEach(e1 => {
-            let node1 = { id: e1.sourceId, label: e1.sourceDesc }
-            let node2 = { id: e1.targetId, label: e1.targetDesc }
-            let edge = { source: e1.sourceId, target: e1.targetId }
-            if (node1.id) {
-                if (JSON.stringify(data.nodes).indexOf(JSON.stringify(node1)) === -1) {
-                    data.nodes.push(node1)
-                }
-            }
-            if (node2.id) {
-                if (JSON.stringify(data.nodes).indexOf(JSON.stringify(node2)) === -1) {
-                    data.nodes.push(node2)
-                }
-            }
-            if (edge.source) {
-                if (JSON.stringify(data.edges).indexOf(JSON.stringify(edge)) === -1) {
-                    data.edges.push(edge)
-                }
-            }
-        })
-
-        return data
-    })
-}
 
 
 function setArrToJson(arr, nodes, edges) {
