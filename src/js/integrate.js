@@ -281,14 +281,15 @@ export async function getDocSort(arr) {
     // where t1.type = 'd' and t1.id in ('${str}')
     // ORDER BY IFNULL(t2.backcount,0) desc,ifnull(t3.frontcount,0) desc`
     let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
-    left join ( select def_block_id as id,count(root_id) as backcount from refs
+    left join ( select def_block_id as id,count(distinct root_id) as backcount from refs
  where root_id in (select id from blocks where type in ('${type}'))
   GROUP BY def_block_id) t2 on t1.id = t2.id
-    left join (select root_id as id,count(def_block_id) as frontcount from refs 
+    left join (select root_id as id,count(distinct def_block_id) as frontcount from refs 
 where def_block_id in (select id from blocks where type in ('${type}'))
  GROUP BY root_id) t3 on t1.id = t3.id
     where t1.type in ('${type}') and t1.id in ('${str}')
     ORDER BY IFNULL(t2.backcount,0) desc,ifnull(t3.frontcount,0) desc;`
+    // console.log('sql',sqldata)
     return await sql(sqldata).then(res => {
         // console.log(res)
         // console.log(sqldata)
@@ -303,10 +304,10 @@ export async function getDocCount(id) {
     // 获取nodeid组，返回排序后的文档块信息列表
     let type = blockType.join('\',\'')
     let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
-    left join ( select def_block_id as id,count(root_id) as backcount from refs
+    left join ( select def_block_id as id,count(distinct root_id) as backcount from refs
  where root_id in (select id from blocks where type in ('${type}'))
   GROUP BY def_block_id) t2 on t1.id = t2.id
-    left join (select root_id as id,count(def_block_id) as frontcount from refs 
+    left join (select root_id as id,count(distinct def_block_id) as frontcount from refs 
 where def_block_id in (select id from blocks where type in ('${type}'))
  GROUP BY root_id) t3 on t1.id = t3.id
     where t1.type = 'd' and t1.id ='${id}';`
