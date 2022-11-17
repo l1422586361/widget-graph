@@ -15,7 +15,12 @@ export var config = {
             // center: [200,50],
             // gravity: 30,
             edgeStrength: 0.8,
-            nodeStrength: -200,
+            // nodeStrength: -200,
+            nodeStrength: (d) => {
+                if (d.isLeaf){
+                    return -50;
+                }return -200;
+            },
             preventOverlap: true,
             // nodeSpacing: 200,
             linkDistance: 150,
@@ -43,9 +48,12 @@ export var config = {
             default: ['drag-canvas', 'zoom-canvas', 'click-select', 'drag-node', 'activate-relations'],
         }
     },
+    ignoreNote: ['20211104180818-u19xi5t'], // 全局关系图忽略笔记
+    ignoteNoteBook: [], // 全局关系图忽略笔记本,没实装
     data: {
         nodes: [],
-        edges: []
+        edges: [],
+        combos: []
     },
     extNodeStyle: {
         // 配色表 http://tool.c7sky.com/webcolor/
@@ -54,6 +62,13 @@ export var config = {
             fill: "#FFCC99",
             shadowColor: "#FFCC99",
             stroke: "#FFCC99",
+        },
+    },
+    superNodeStyle: {
+        style: {
+            fill: "#FF9999",
+            shadowColor: "#FF9999",
+            stroke: "#FF9999",
         },
     },
     queryBlockType: ['d'],  // 查询的块类型筛选，仅保留文档块，避免太多干扰信息

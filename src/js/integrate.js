@@ -179,14 +179,73 @@ export async function getBackNodeCount(nodeid) {
 
 // ------------ 思源方法 -----------
 
-export async function getAllLinks(){
+export async function getAllLinksByid(id){
+    // 基于文档id获取关系，返回数组
+    // 遍历方法来扩展，效果不佳
+    let links = [];
+    return Promise.all([getBacklink(id), getFrontLinks(id)]).then(e => {
+        // console.log("反链", e[0])
+        if (e[0].linkRefsCount != 0) {
+            // console.log(1111)
+            for (let refNode of e[0].backlinks) {
+                links.push({id:refNode.id,name:refNode.name})
+            }
+        }
+
+        for (let refNode of e[1]) {
+            links.push({id:refNode.targetId,name:refNode.targetName})
+        }
+        // console.log(links)
+        return links
+    })
+}
+
+
+export async function getAllNoteByIdToGraph(obj,id){
+    // 基于文档id获取所有关系并渲染到画布上
+    Promise.all([getBacklink(id), getFrontLinks(id)]).then(e => {
+        // console.log("反链", e[0])
+        if (e[0].linkRefsCount != 0) {
+            // console.log(1111)
+            for (let refNode of e[0].backlinks) {
+                addNode(obj, refNode.id, refNode.name)
+                // addEdge(graph, id,refNode.id)
+                addEdge(obj, refNode.id, id)
+            }
+        }
+
+        for (let refNode of e[1]) {
+            addNode(obj, refNode.targetId, refNode.targetName)
+            // addEdge(graph, id,refNode.id)
+            addEdge(obj, id, refNode.targetId)
+        }
+    })
+}
+
+const ignoreNote = config.ignoreNote.join('\',\'')
+
+export async function getAllLinks(id){
+    // 加id获取所有基于id的note
+    // 不加id获取全局关系
     let type = blockType.join('\',\'')
-    let sqldata = `select t1.def_block_id as sourceId,t2.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
+    let 条件 = ''
+    // let ignoreNote = config.ignoreNote.join('\',\'')
+    if (id){
+        条件 = `and (t1.def_block_id = '${id}' or t1.root_id = '${id}')`
+    }
+    if (type){
+        条件 += `and t2.type in ('${type}') and t3.type in ('${type}')`
+    }
+    if (ignoreNote){
+        条件 += `and t1.def_block_id not in ('${ignoreNote}') and t1.root_id not in ('${ignoreNote}')`
+    }
+    let sqldata = `select t2.box as sourceBox,t3.box as targetBox,t1.def_block_id as sourceId,t2.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
     left join blocks t2 on t1.def_block_id = t2.id
     LEFT JOIN blocks t3 on t1.root_id = t3.id
-    where t2.type in ('${type}') and t3.type in ('${type}')
+    where  1=1 ${条件}
     GROUP BY t1.def_block_id,t1.root_id
     ;`
+    // console.log(sqldata)
     return await sql(sqldata).then(res => {
         // console.log(res)
         return res
@@ -217,14 +276,15 @@ export async function getDocSort(arr) {
     let str = arr.join('\',\'')
     let type = blockType.join('\',\'')
     let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
-    left join ( select def_block_id as id,count(root_id) as backcount from refs
+    left join ( select def_block_id as id,count(distinct root_id) as backcount from refs
  where root_id in (select id from blocks where type in ('${type}'))
   GROUP BY def_block_id) t2 on t1.id = t2.id
-    left join (select root_id as id,count(def_block_id) as frontcount from refs 
+    left join (select root_id as id,count(distinct def_block_id) as frontcount from refs 
 where def_block_id in (select id from blocks where type in ('${type}'))
  GROUP BY root_id) t3 on t1.id = t3.id
     where t1.type in ('${type}') and t1.id in ('${str}')
     ORDER BY IFNULL(t2.backcount,0) desc,ifnull(t3.frontcount,0) desc;`
+    // console.log('sql',sqldata)
     return await sql(sqldata).then(res => {
         // console.log(res)
         // console.log(sqldata)
@@ -239,10 +299,10 @@ export async function getDocCount(id) {
     // 获取nodeid组，返回排序后的文档块信息列表
     let type = blockType.join('\',\'')
     let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
-    left join ( select def_block_id as id,count(root_id) as backcount from refs
+    left join ( select def_block_id as id,count(distinct root_id) as backcount from refs
  where root_id in (select id from blocks where type in ('${type}'))
   GROUP BY def_block_id) t2 on t1.id = t2.id
-    left join (select root_id as id,count(def_block_id) as frontcount from refs 
+    left join (select root_id as id,count(distinct def_block_id) as frontcount from refs 
 where def_block_id in (select id from blocks where type in ('${type}'))
  GROUP BY root_id) t3 on t1.id = t3.id
     where t1.type = 'd' and t1.id ='${id}';`
