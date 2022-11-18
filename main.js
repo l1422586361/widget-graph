@@ -503,8 +503,10 @@ graph.on('node:click', (evt) => {
         let updated = e[0].updated
         let frontLinkCount = e[1][0].frontcount
         let backLinkCount = e[1][0].backcount
-        let url = 'http://' + window.location.host + '/stage/build/mobile/?focus=0&editable=0&id=' + id
+        let url = 'siyuan://blocks/'  +  id
+        // let url = 'http://' + window.location.host + '/stage/build/mobile/?focus=0&editable=0&id=' + id
         // http://127.0.0.1:6806/stage/build/mobile/?focus=0&editable=0&id=20220606093400-r0y6l0z
+        // siyuan://blocks/20220119105426-q3chsry
         let rr = `<ul class="list-group">
                             <li class="list-group-item"><h2>${name}</h2> </li>
                             <li class="list-group-item">Id：<a href="${url}" target="_blank">${id}</a></li>

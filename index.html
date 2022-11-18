@@ -15,7 +15,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- 左栏 -->
-            <div class="col-md-2" style="padding-top: 20px;">
+            <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2" style="padding-top: 20px;">
                 <div class="panel">
                     <form class="form-inline">
                         <div class="form-group">
@@ -38,7 +38,7 @@
                     <!-- <ul></ul> -->
 
                     <!-- </div> -->
-                    <div class="list-group" id="note-info" style="height: 700px;overflow:auto;">
+                    <div class="list-group" id="note-info" style="height: 350px;overflow:auto;">
                         <!-- active -->
                         <!-- 信息内容插入 -->
                         <!-- <div class="list-group-item" style="height: 70px;padding: 16px 15px;">
@@ -47,8 +47,8 @@
                                     01_Linux</h4>
                                 <p class="list-group-item-text">...</p>
                             </div> -->
-                            <!-- 按钮下拉菜单 -->
-                            <!-- <div class="dropdown" style="float:right;">
+                        <!-- 按钮下拉菜单 -->
+                        <!-- <div class="dropdown" style="float:right;">
                                 <button id="dLabel" type="button" class="dropdown-toggle btn btn-default glyphicon glyphicon-plus"
                                     aria-hidden="true" data-toggle="dropdown" aria-haspopup="false"
                                     aria-expanded="false"></button>
@@ -62,10 +62,20 @@
                             </div>
 
                         </div> -->
-                        
-                        
 
 
+
+
+
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">详细信息</h3>
+                    </div>
+                    <div class="panel-body" id="detailInfo" style="height: 300px;">
+                        <!-- 详细信息主要 -->
 
                     </div>
                 </div>
@@ -78,8 +88,8 @@
             </div>
 
             <!-- 中间图层 -->
-            <div class="col-md-8" id="mountNode"
-                style="height: 800px;border: 1px solid gray;border-radius: 20px;margin-top: 20px;">
+            <div class="col-xs-6 col-sm-8 col-md-9 col-lg-10" id="mountNode"
+                style="height: 100%;border: 1px solid gray;border-radius: 20px;margin-top: 20px;">
                 <div class="btn-group g6-toolbar-ul" role="group" aria-label="...">
                     <button type="file" class="btn btn-default" onclick="select_file()">导入数据</button>
                     <button type="button" class="btn btn-default" onclick='saveData()'>保存数据</button>
@@ -91,26 +101,7 @@
                 </div>
             </div>
             <!-- 右栏 -->
-            <div class="col-md-2" style="padding-top: 20px;">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">详细信息</h3>
-                    </div>
-                    <div class="panel-body" id="detailInfo" style="height: 500px;">
-                        <!-- 详细信息主要 -->
 
-                    </div>
-                </div>
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">日志窗口</h3>
-                    </div>
-                    <div class="panel-body" style="height: 200px;">
-                        日志窗口主要
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>
