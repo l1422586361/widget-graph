@@ -10,6 +10,16 @@ config.forceGraph.width = container.scrollWidth || 1000;
 config.forceGraph.height = container.scrollHeight || 600;
 config.forceGraph.container = 'mountNode';
 
+// 浏览器窗口发生变化时，修改画布大小
+window.onresize = function (){
+    let canvasHeight = document.documentElement.clientHeight;
+    let canvasWidth = document.documentElement.clientWidth;
+    console.log(canvasHeight,canvasWidth)
+    graph.changeSize(canvasWidth,canvasHeight)
+}
+
+
+
 // 节点右键菜单
 const menu = new G6.Menu({
     // https://g6.antv.vision/zh/examples/tool/contextMenu 右侧Menu配置项
@@ -508,7 +518,7 @@ graph.on('node:click', (evt) => {
         // http://127.0.0.1:6806/stage/build/mobile/?focus=0&editable=0&id=20220606093400-r0y6l0z
         // siyuan://blocks/20220119105426-q3chsry
         let rr = `<ul class="list-group">
-                            <li class="list-group-item"><h2>${name}</h2> </li>
+                            <li class="list-group-item"><h2 style="width:170px;overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="${name}">${name}</h2> </li>
                             <li class="list-group-item">Id：<a href="${url}" target="_blank">${id}</a></li>
                             <li class="list-group-item">创建时间：${created}</li>
                             <li class="list-group-item">更新时间：${updated}</li>
@@ -553,3 +563,8 @@ window.getSuperNode = function () {
     // console.log(e,e2)
 }
 
+
+
+window.clearGraph = function(){
+    graph.clear()
+}
