@@ -2,115 +2,138 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>graph</title>
-    <link rel="stylesheet" href="./lib/bootstrap-3.4.1-dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./src/css/main.css">
+    <link rel="stylesheet" href="./lib/bootstrap-3.4.1-dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./src/css/main.css" />
     <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <script src="./lib/jquery-1.12.4.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="./lib/bootstrap-3.4.1-dist/js/bootstrap.min.js"></script>
 </head>
 
 <body>
     <div class="container-fluid">
-        <div class="row">
-            <!-- 左栏 -->
-            <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2" style="padding-top: 20px;">
-                <div class="panel">
-                    <form class="form-inline">
-                        <div class="form-group">
-                            <!-- <input type="text" class="form-control" id="exampleInputName2" placeholder="笔记本id"> -->
-                            <input type="text" class="form-control" id="text" placeholder="关键字"
-                                onkeydown="if(event.keyCode==13){return false}">
-                            <button id="btnGetNode" type="button" class="btn btn-default"
-                                onclick="getNote()">查询</button>
-                        </div>
-                        <!-- <button type="button" class="btn btn-default" onclick="getBacklink1()">查询</button> -->
+        <div id="mountNode">
+            <div class="btn-group g6-toolbar-ul" role="group" aria-label="...">
+                <button id="searchNote" type="button" class="btn btn-default" data-toggle="modal" data-target=".bs-example-modal-sm">
+                    搜索
+                </button>
+                <button type="file" class="btn btn-default" onclick="select_file()">
+                    导入数据
+                </button>
+                <button type="button" class="btn btn-default" onclick="saveData()">
+                    保存数据
+                </button>
+                <button type="button" class="btn btn-default" onclick="getAllLinksToGraph()">
+                    全局关系图
+                </button>
+                <button type="button" class="btn btn-default" onclick="refreshGraph()">
+                    刷新画布布局
+                </button>
+                <button type="button" class="btn btn-default" onclick="getSuperNode()">
+                    超级节点高亮
+                </button>
+                <button type="button" class="btn btn-default" onclick="clearGraph()">
+                    清除画布
+                </button>
+                <input class="button" type="file" id="file" onchange="importData(this.files)" style="display: none" />
+            </div>
 
-                    </form>
-                </div>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">信息展示</h3>
-                    </div>
-                    <!-- <div class="panel-body" id="note-info"> -->
-                    <!-- 信息展示主要 -->
-                    <!-- <ul></ul> -->
 
-                    <!-- </div> -->
-                    <div class="list-group" id="note-info" style="height: 350px;overflow:auto;">
-                        <!-- active -->
-                        <!-- 信息内容插入 -->
-                        <!-- <div class="list-group-item" style="height: 70px;padding: 16px 15px;">
-                            <div style="float:left;">
-                                <h4 class="list-group-item-heading" id="20211107184955-us2ys4d" data-name="test1">
-                                    01_Linux</h4>
-                                <p class="list-group-item-text">...</p>
-                            </div> -->
-                        <!-- 按钮下拉菜单 -->
-                        <!-- <div class="dropdown" style="float:right;">
-                                <button id="dLabel" type="button" class="dropdown-toggle btn btn-default glyphicon glyphicon-plus"
-                                    aria-hidden="true" data-toggle="dropdown" aria-haspopup="false"
-                                    aria-expanded="false"></button>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"
-                                    style="position:absolute;left: -120px;top: 32px;z-index: 9999;" >
-                                    <li role="presentation"><a role="menuitem" tabindex="-1">添加节点</a></li>
-                                    <li role="presentation"><a role="menuitem" tabindex="-1">扩展一度关系笔记</a></li>
-                                    <li role="presentation"><a role="menuitem" tabindex="-1">扩展二度关系笔记</a></li>
-                                    <li role="presentation"><a role="menuitem" tabindex="-1">扩展三度关系笔记</a></li>
-                                </ul>
+            <!-- 侧边导航 -->
+            <div id="rightNav" style="background-color:white;">
+                <ul id="rightNav-left" class="nav nav-pills nav-stacked">
+                    <li id="tab0" role="presentation" class="selected"><a>X</a></li>
+                    <li id="tab1" role="presentation" class="active selected"><a href="#rightNav-tab1">H</a></li>
+                    <li id="tab2" role="presentation"><a href="#rightNav-tab2">P</a></li>
+                    <!-- <li role="presentation"><a href="#rightNav-tab3">M</a></li> -->
+                </ul>
+                <div id="rightNav-tab1" class="selected" style="width: 100%;height: 100%">
+                    <div class="panel">
+                        <form class="form-inline">
+                            <div class="form-group" style="display:flex;width: 100%;">
+                                <!-- <input type="text" class="form-control" id="exampleInputName2" placeholder="笔记本id"> -->
+                                <input type="text" class="form-control" id="text" placeholder="关键字"
+                                    onkeydown="if(event.keyCode==13){return false}" style="width: 80%;margin-right: 5px;">
+                                <button id="btnGetNode" type="button" class="btn btn-default"
+                                    onclick="getNote()">查询</button>
                             </div>
+                            <!-- <button type="button" class="btn btn-default" onclick="getBacklink1()">查询</button> -->
 
+                        </form>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">信息展示</h3>
+                        </div>
+                        <!-- <div class="panel-body" id="note-info"> -->
+                        <!-- 信息展示主要 -->
+                        <!-- <ul></ul> -->
+
+                        <!-- </div> -->
+                        <div class="list-group" id="note-info" style="overflow:auto;">
+                            <!-- active -->
+                            <!-- 信息内容插入 -->
+                            <!-- <div class="list-group-item" style="height: 70px;padding: 16px 15px;">
+                        <div style="float:left;">
+                            <h4 class="list-group-item-heading" id="20211107184955-us2ys4d" data-name="test1">
+                                01_Linux</h4>
+                            <p class="list-group-item-text">...</p>
                         </div> -->
+                            <!-- 按钮下拉菜单 -->
+                            <!-- <div class="dropdown" style="float:right;">
+                            <button id="dLabel" type="button" class="dropdown-toggle btn btn-default glyphicon glyphicon-plus"
+                                aria-hidden="true" data-toggle="dropdown" aria-haspopup="false"
+                                aria-expanded="false"></button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel"
+                                style="position:absolute;left: -120px;top: 32px;z-index: 9999;" >
+                                <li role="presentation"><a role="menuitem" tabindex="-1">添加节点</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1">扩展一度关系笔记</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1">扩展二度关系笔记</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1">扩展三度关系笔记</a></li>
+                            </ul>
+                        </div>
+
+                    </div> -->
 
 
 
 
 
+                        </div>
                     </div>
                 </div>
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">详细信息</h3>
-                    </div>
-                    <div class="panel-body" id="detailInfo" style="height: 300px;">
-                        <!-- 详细信息主要 -->
-
+                <div id="rightNav-tab2" style="width: 100%;height: 100%;">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">详细信息</h3>
+                        </div>
+                        <div class="panel-body" id="detailInfo" style="height: 100%;">
+                            <!-- 详细信息主要 -->
+    
+                        </div>
                     </div>
                 </div>
-
-
-
-
-
+                <!-- 第三个按钮页面 -->
+                <!-- <div id="rightNav-tab3" style="width: 100%;height: 100%;">
+                    333
+                </div> -->
 
             </div>
-
-            <!-- 中间图层 -->
-            <div class="col-xs-6 col-sm-8 col-md-9 col-lg-10" id="mountNode"
-                style="height: 100%;border: 1px solid gray;border-radius: 20px;margin-top: 20px;">
-                <div class="btn-group g6-toolbar-ul" role="group" aria-label="...">
-                    <button type="file" class="btn btn-default" onclick="select_file()">导入数据</button>
-                    <button type="button" class="btn btn-default" onclick='saveData()'>保存数据</button>
-                    <button type="button" class="btn btn-default" onclick='getAllLinksToGraph()'>全局关系图</button>
-                    <button type="button" class="btn btn-default" onclick='refreshGraph()'>刷新画布布局</button>
-                    <button type="button" class="btn btn-default" onclick='getSuperNode()'>超级节点高亮</button>
-                    <input class="button" type="file" id="file" onchange="importData(this.files)"
-                        style="display:none" />
-                </div>
-            </div>
-            <!-- 右栏 -->
-
         </div>
 
     </div>
 
 
 
-    <script src="./lib/jquery-1.12.4.min.js"></script>
-    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
-    <script src="./lib/bootstrap-3.4.1-dist/js/bootstrap.min.js"></script>
+
+
+
+
+
 </body>
 
 <script type="module" src="./main.js"></script>

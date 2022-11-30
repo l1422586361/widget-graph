@@ -5,17 +5,21 @@ import { addEdge, addNode, updateNodeTo1, hasEdge, getBackNodeCount, getFrontLin
 
 
 // init graph
-const container = document.getElementById('mountNode');
-config.forceGraph.width = container.scrollWidth || 1000;
-config.forceGraph.height = container.scrollHeight || 600;
+// const container = document.getElementById('mountNode');
+config.forceGraph.width = document.documentElement.clientWidth;
+// config.forceGraph.width = container.scrollWidth || 1000;
+config.forceGraph.height = document.documentElement.clientHeight;
+// config.forceGraph.height = container.scrollHeight || 600;
 config.forceGraph.container = 'mountNode';
+
 
 // 浏览器窗口发生变化时，修改画布大小
 window.onresize = function (){
     let canvasHeight = document.documentElement.clientHeight;
     let canvasWidth = document.documentElement.clientWidth;
-    console.log(canvasHeight,canvasWidth)
+    // console.log(canvasHeight,canvasWidth)
     graph.changeSize(canvasWidth,canvasHeight)
+    // $('#note-info').css('max-height',canvasWidth-100)
 }
 
 
@@ -115,18 +119,17 @@ window.refreshGraph = function () {
 window.getAllLinksToGraph = function () {
     let graphData = config.data
     getAllLinks().then(e => {
-        console.log(e)
         for (let link of e) {
             let sourceNode = { id: link.sourceId, label: link.sourceDesc }
             let targetNode = { id: link.targetId, label: link.targetDesc }
             let edge = { source: link.targetId, target: link.sourceId }
-            if (JSON.stringify(graphData.nodes).indexOf(JSON.stringify(sourceNode)) === -1) {
+            if (graphData.nodes.map(e=>{return e.id}).indexOf(sourceNode.id) === -1) {
                 graphData.nodes.push(sourceNode)
             }
-            if (JSON.stringify(graphData.nodes).indexOf(JSON.stringify(targetNode)) === -1) {
+            if (graphData.nodes.map(e=>{return e.id}).indexOf(targetNode.id) === -1) {
                 graphData.nodes.push(targetNode)
             }
-            if (JSON.stringify(graphData.edges).indexOf(JSON.stringify(edge)) === -1) {
+            if (graphData.edges.map(e=>{return JSON.stringify({source: e.source,target:e.target})}).indexOf(JSON.stringify({ source: link.targetId, target: link.sourceId })) === -1) {
                 graphData.edges.push(edge)
             }
         }
@@ -261,12 +264,19 @@ window.getNote = function () {
         // 移除元素
         $("#note-info li").remove()
         $("#note-info").append("<h5>&nbsp&nbsp&nbsp加载中....请稍等，如数据过大，可查看console确认是否正在执行</h4>")
+        
     })
+    
+
+
     // 全文检索关键字
 
     getDocInfoByKey2(key).then(e => {
         // console.log("eeee",e)
         $("#note-info h5").remove()
+        let divHeight = document.documentElement.clientHeight
+        console.log(divHeight)
+        $('#note-info').css('max-height',divHeight-100)
         for (let doc of e) {
             // console.log("get",e.id)
             // let rr = `<li class="list-group-item" style="height: 70px;padding: 16px 15px;">
@@ -529,6 +539,10 @@ graph.on('node:click', (evt) => {
 
     })
 
+    // 显示右侧导航
+    $('#rightNav').css("display","flex")
+    $("#tab2").click()
+
 })
 
 
@@ -568,3 +582,34 @@ window.getSuperNode = function () {
 window.clearGraph = function(){
     graph.clear()
 }
+
+
+
+$(function () {
+    // 右侧导航
+    $('#rightNav-left li').click(function () {
+        let _this = $(this)
+        let _last = _this.siblings(".selected");
+        let _selector = _last.children().attr("href");
+        let _id = _this.children().attr("href");
+        $(_selector).removeClass("selected");
+        $(_id).addClass("selected");
+        _this.addClass("selected active");
+        // _this.addClass("active");
+        _this.siblings("li").removeClass("active")
+        _last.removeClass("selected");
+    })
+
+    // 搜索按钮
+    $("#searchNote").click(function(){
+        // let _this = $(this)
+        $('#rightNav').css("display","flex")
+        $("#tab1").click()
+        $('#text').focus()
+    })
+
+    // 右侧面板关闭
+    $("#tab0").click(function(){
+        $('#rightNav').css("display","none")
+    })
+})
