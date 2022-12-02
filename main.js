@@ -643,15 +643,17 @@ async function expand3LayerOfRelationship(id, obj) {
 
 
 window.onload = function () {
-    try {
-        setTimeout(function () {
+
+    setTimeout(function () {
+        try {
             let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
             getBlockByID(nodeid).then(e => {
                 expand1LayerOfRelationship(e.root_id, graph)
             })
-        }, 2000) // 延时，需要等待挂件块id入库，不然getBlockByID查不到数据
-    } catch (err) {
-        console.warn(err);
-        console.log("当前不在思源文档内部")
-    }
+        } catch (err) {
+            console.warn(err);
+            console.log("当前不在思源文档内部")
+        }
+    }, 2000) // 延时，需要等待挂件块id入库，不然getBlockByID查不到数据
+
 }
