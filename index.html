@@ -154,5 +154,54 @@
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
 <script src="./lib/bootstrap-3.4.1-dist/js/bootstrap.min.js"></script>
 <script type="module" src="./main.js"></script>
+<script type="module">
+    import { config, } from "./src/js/config.js"
+    import { getAllLinks, } from "./src/js/integrate.js"
+    import { setArrToJson } from "./main.js"
+    import { getBlockByID, } from "./src/utils/api.js"
+    const initData = config.data
+    window.onload = function () {
+        // 加载时基于当前文档块自动扩展一层
+
+        try {
+            let node = window.frameElement.parentElement.parentElement
+            // .parentElement.parentElement.firstChild
+            // <div data-node-id="20221130163037-0ot7t9w" data-node-index="4" data-type="NodeWidget" class="iframe" updated="20221130163037" data-subtype="widget" data-eof="true"><div class="iframe-content"><iframe src="/widgets/widget-graph" data-src="/widgets/widget-graph" data-subtype="widget" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe><span class="protyle-action__drag" contenteditable="false"></span></div><div class="protyle-attr" contenteditable="false">​</div></div>
+            // console.log(node)
+            let id = node.dataset.nodeId
+            console.log('id', node,id, initData)
+            async function fn() {
+                let nodes = []
+                let edges = []
+                // let root_id = await getBlockByID(id)
+                getBlockByID(id).then(e=>{
+                    console.log(id)
+                    console.log(e)
+                })
+                // let res1 = await getAllLinks(id)
+                // console.log(11,root_id)
+                // res1.forEach(e => {
+                //     setArrToJson(e,nodes,edges)
+                //     // console.log(nodes,edges)
+                // });
+                // console.log('res',nodes,edges)
+            }
+
+            fn()
+            // (async function () {
+            //     let nodes = []
+            //     let edges = []
+            //     let res1 = await getAllLinks(id)
+            //     res1.forEach(e => {
+            //         setArrToJson(e, nodes, edges)
+            //     })
+            //     console.log("res", nodes, edges)
+            // })()
+        } catch (err) {
+            console.warn(err);
+            console.log("当前不在思源文档内部")
+        }
+    }
+</script>
 
 </html>
