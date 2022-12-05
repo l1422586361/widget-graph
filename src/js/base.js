@@ -8,7 +8,7 @@ const blockType = config.queryBlockType
 
 // ------------ g6引擎封装函数 -----------
 
-export async function hasNode(obj, id) {
+async function hasNode(obj, id) {
     // 判断是否已有节点
     let findNode = obj.find('node', (node) => {
         return node.get('model').id === id;
@@ -21,7 +21,7 @@ export async function hasNode(obj, id) {
     }
 }
 
-export async function hasEdge(obj, source_id, target_id) {
+async function hasEdge(obj, source_id, target_id) {
     // 判断是否已有边
     let findEdge = obj.find('edge', (edge) => {
         return (edge.get('model').source === source_id && edge.get('model').target === target_id);
@@ -141,33 +141,31 @@ export async function clearInvalidNodes(obj) {
     }
 }
 
-export async function getBackLinkNode(obj, nodeid) {
-    // obj: graph
-    // nodeid: 笔记本ID
-    // 基于笔记本id增加反链节点
-    getBlockByID(nodeid).then(function (res) {
-        addNode(obj, nodeid, res.content)
-        getBacklink(nodeid).then(function (res) {
-            for (let refNode of res.backlinks) {
-                addNode(obj, refNode.id, refNode.name)
-                addEdge(obj, nodeid, refNode.id)
-            }
-        })
-    })
-}
 
-export async function getBackNodeCount(nodeid) {
-    // 统计反链计数
-    // 弃用，未筛选不含d的文档块
-    return getBacklink(nodeid).then(e => {
-        // console.log(e.mentionsCount)
-        return e.linkRefsCount;
-    }).catch(err => {
-        console.log(err)
-        return 0
-    })
-}
 
+export function setArrToJson(arr, nodes, edges) {
+    let node1 = { id: arr.sourceId, label: arr.sourceDesc }
+    let node2 = { id: arr.targetId, label: arr.targetDesc }
+    let edge = { source: arr.sourceId, target: arr.targetId }
+    // console.log(1111, node1, node2, edge)
+    if (node1.id) {
+        if (JSON.stringify(nodes).indexOf(JSON.stringify(node1)) === -1) {
+            nodes.push(node1)
+        }
+    }
+    if (node2.id) {
+        if (JSON.stringify(nodes).indexOf(JSON.stringify(node2)) === -1) {
+            nodes.push(node2)
+        }
+    }
+    if (edge.source) {
+        if (JSON.stringify(edges).indexOf(JSON.stringify(edge)) === -1) {
+            edges.push(edge)
+        }
+    }
+    // return nodes,edges
+
+}
 
 
 
@@ -179,48 +177,7 @@ export async function getBackNodeCount(nodeid) {
 
 // ------------ 思源方法 -----------
 
-export async function getAllLinksByid(id){
-    // 基于文档id获取关系，返回数组
-    // 遍历方法来扩展，效果不佳
-    let links = [];
-    return Promise.all([getBacklink(id), getFrontLinks(id)]).then(e => {
-        // console.log("反链", e[0])
-        if (e[0].linkRefsCount != 0) {
-            // console.log(1111)
-            for (let refNode of e[0].backlinks) {
-                links.push({id:refNode.id,name:refNode.name})
-            }
-        }
 
-        for (let refNode of e[1]) {
-            links.push({id:refNode.targetId,name:refNode.targetName})
-        }
-        // console.log(links)
-        return links
-    })
-}
-
-
-export async function getAllNoteByIdToGraph(obj,id){
-    // 基于文档id获取所有关系并渲染到画布上
-    Promise.all([getBacklink(id), getFrontLinks(id)]).then(e => {
-        // console.log("反链", e[0])
-        if (e[0].linkRefsCount != 0) {
-            // console.log(1111)
-            for (let refNode of e[0].backlinks) {
-                addNode(obj, refNode.id, refNode.name)
-                // addEdge(graph, id,refNode.id)
-                addEdge(obj, refNode.id, id)
-            }
-        }
-
-        for (let refNode of e[1]) {
-            addNode(obj, refNode.targetId, refNode.targetName)
-            // addEdge(graph, id,refNode.id)
-            addEdge(obj, id, refNode.targetId)
-        }
-    })
-}
 
 const ignoreNote = config.ignoreNote.join('\',\'')
 
@@ -321,28 +278,7 @@ function up(x, y) {
     return y.backCount - x.backCount
 }
 
-export async function getDocInfoByKey(k) {
-    // 弃用，等同步排序，加载起来太慢
-    return await fullTextSearchBlock(k).then(async e => {
-        var result = []
-        for (let doc of e.blocks) {
-            try {
-                doc.backCount = await getBackNodeCount(doc.id);
-                doc.frontCount = await getFrontLinks(doc.id).then(async e => { return await e.length });
-                result.push(doc)
-            } catch (err) {
-                console.log(err)
-            }
 
-            console.log("doc", doc)
-        }
-        // console.log("result",result)
-        return result
-    }).then(e => {
-        // console.log(222,e.sort(up))
-        return e.sort(up)
-    })
-}
 
 
 export async function getDocInfoByKey2(k) {
@@ -355,7 +291,6 @@ export async function getDocInfoByKey2(k) {
         return getDocSort(arr)
     })
 }
-
 
 
 
