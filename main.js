@@ -38,10 +38,10 @@ window.onresize = function () {
 
 
 // 节点右键菜单
-export const menu = new G6.Menu({
+const menu = new G6.Menu({
     // https://g6.antv.vision/zh/examples/tool/contextMenu 右侧Menu配置项
-    offsetX: -280,
-    offsetY: -30,
+    offsetX: 10 + 10,
+    offsetY: 0,
     itemTypes: ['node'],
     getContent(e) {
         return `<div class="btn-group-vertical" role="group" aria-label="...">
