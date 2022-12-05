@@ -24,6 +24,10 @@
                     <!-- 搜索 -->
                     <i class="glyphicon glyphicon-search" aria-hidden="true"></i>
                 </button>
+                <button type="button" class="btn btn-default" onclick="getAllLinksToGraph()" title="全局关系图">
+
+                    <i class="fa fa-spinner" aria-hidden="true"></i>
+                </button>
                 <button type="file" class="btn btn-default" onclick="select_file()" title="导入数据">
 
                     <i class="glyphicon glyphicon-upload" aria-hidden="true"></i>
@@ -32,10 +36,7 @@
 
                     <i class="glyphicon glyphicon-download-alt" aria-hidden="true"></i>
                 </button>
-                <button type="button" class="btn btn-default" onclick="getAllLinksToGraph()" title="全局关系图">
-
-                    <i class="fa fa-spinner" aria-hidden="true"></i>
-                </button>
+                
                 <button type="button" class="btn btn-default" onclick="refreshGraph()" title="刷新画布布局">
 
                     <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i>
