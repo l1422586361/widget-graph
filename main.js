@@ -353,17 +353,42 @@ $(function () {
 
 window.onload = function () {
 
-    setTimeout(function () {
+    setTimeout(async function () {
         try {
             let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
-            getBlockByID(nodeid).then(e => {
-                expand1LayerOfRelationship(e.root_id, graph)
+            await fetch(`/widgets/graph-data/data-${nodeid}.json`).then(res => {
+                if (res.status == 404) {
+                    getBlockByID(nodeid).then(e => {
+                        expand1LayerOfRelationship(e.root_id, graph)
+                    })
+                } else {
+                    return res
+                }
+            }).then(async res => {
+                // console.log(await res.json(),2222)
+                graph.changeData(await res.json())
+            }).catch(err => {
+                console.log(err, 11111)
             })
+            // getBlockByID(nodeid).then(e => {
+            //     expand1LayerOfRelationship(e.root_id, graph)
+            // })
         } catch (err) {
             console.warn(err);
             console.log("当前不在思源文档内部")
         }
     }, 2000) // 延时，需要等待挂件块id入库，不然getBlockByID查不到数据
+    // setTimeout(function () {
+    //     try {
+    //         let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
+    //         getBlockByID(nodeid).then(e => {
+    //             expand1LayerOfRelationship(e.root_id, graph)
+    //         })
+    //     } catch (err) {
+    //         console.warn(err);
+    //         console.log("当前不在思源文档内部")
+    //     }
+    // }, 2000) // 延时，需要等待挂件块id入库，不然getBlockByID查不到数据
 
 }
 
@@ -384,18 +409,53 @@ window.importData = function (files) {
 }
 
 // 下载文件/保存数据
-window.saveData = function () {
+// window.saveData = function () {
+//     let graphData = graph.save()
+//     let saveData = {}
+//     saveData.nodes = graphData.nodes
+//     saveData.edges = graphData.edges
+//     console.log("saveData", saveData)
+//     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
+//     let downloadAnchorNode = document.createElement('a')
+//     downloadAnchorNode.setAttribute("href", dataStr);
+//     downloadAnchorNode.setAttribute("download", "result.json")
+//     downloadAnchorNode.click();
+//     downloadAnchorNode.remove();
+// }
+
+window.saveData = async function () {
     let graphData = graph.save()
     let saveData = {}
     saveData.nodes = graphData.nodes
     saveData.edges = graphData.edges
     console.log("saveData", saveData)
-    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
-    let downloadAnchorNode = document.createElement('a')
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "result.json")
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    try {
+        let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
+        let saveDataBlob = new Blob([JSON.stringify(saveData)], { type: 'application/json' })
+        let 数据文件 = new File([saveDataBlob], `dataf${nodeid}.json`, { lastModified: Date.now() })
+        let data = new FormData
+        data.append('assetsDirPath', '/widgets/graph-data/')
+        data.append('file[]', 数据文件)
+        let url = '/api/asset/upload'
+        // let filepath = ""
+        await fetch(url, {
+            body: data,
+            method: 'POST',
+            headers: { 'Authorization': `Token ${config.token}` },
+        }).then(function (response) {
+            console.log(response)
+            return response.json()
+        })
+    } catch {
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
+        let downloadAnchorNode = document.createElement('a')
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "result.json")
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+
 }
 
 
