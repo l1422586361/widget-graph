@@ -60,26 +60,6 @@ const menu = new G6.Menu({
         // console.log(id)
         switch (target.id) {
             case "addAll":
-                // 添加一层关系
-                // updateNodeTo1(graph, item._cfg.id)
-                // getAllNoteByIdToGraph(graph, item._cfg.id)
-                // Promise.all([getBacklink(item._cfg.id), getFrontLinks(item._cfg.id)]).then(e => {
-                //     // console.log("反链", e[0])
-                //     if (e[0].linkRefsCount != 0) {
-                //         console.log(1111)
-                //         for (let refNode of e[0].backlinks) {
-                //             addNode(graph, refNode.id, refNode.name)
-                //             // addEdge(graph, id,refNode.id)
-                //             addEdge(graph, refNode.id, id)
-                //         }
-                //     }
-
-                //     for (let refNode of e[1]) {
-                //         addNode(graph, refNode.targetId, refNode.targetName)
-                //         // addEdge(graph, id,refNode.id)
-                //         addEdge(graph, id, refNode.targetId)
-                //     }
-                // })
                 expand1LayerOfRelationship(item._cfg.id, graph);
             case "addBacklink":
                 // 添加反链
@@ -125,64 +105,6 @@ const menu = new G6.Menu({
 config.forceGraph.plugins = [menu]
 const graph = new G6.Graph(config.forceGraph);
 graph.read(config.data)
-
-
-
-
-
-//   ---------------------------------------------
-// https://g6.antv.vision/zh/examples/net/forceDirected#forceDirectedPreventOverlap 摘自力导向布局防止节点重叠
-// graph.on('node:dragstart', function (e) {
-//     // console.log('eee',e)
-//     graph.layout();
-//     refreshDragedNodePosition(e);
-//   });
-//   graph.on('node:drag', function (e) {
-//     const forceLayout = graph.get('layoutController').layoutMethods[0];
-//     forceLayout.execute();
-//     refreshDragedNodePosition(e);
-//   });
-//   graph.on('node:dragend', function (e) {
-//     e.item.get('model').fx = null;
-//     e.item.get('model').fy = null;
-//   });
-
-// if (typeof window !== 'undefined')
-//   window.onresize = () => {
-//     if (!graph || graph.get('destroyed')) return;
-//     if (!container || !container.scrollWidth || !container.scrollHeight) return;
-//     graph.changeSize(container.scrollWidth, container.scrollHeight);
-//   };
-
-
-//   ---------------------------------------------
-
-// function refreshDragedNodePosition(e) {
-//     const model = e.item.get('model');
-//     model.fx = e.x;
-//     model.fy = e.y;
-// }
-
-
-
-
-// getBacklink1 获取反链，并进行图层渲染
-// window.getBacklink1 = function () {
-//     const id = '20211107184955-us2ys4d'
-
-//     // addNode(graph, id)
-//     getBlockByID(id).then(function (res) {
-//         addNode(graph, id, res.content)
-//         getBacklink(id).then(function (res) {
-//             for (let refNode of res.backlinks) {
-//                 addNode(graph, refNode.id, refNode.name)
-//                 addEdge(graph, id, refNode.id)
-//             }
-//         })
-//     })
-
-// }
-
 
 // 画布内节点左键单击显示详情
 graph.on('node:click', (evt) => {
@@ -250,16 +172,6 @@ $(function () {
             console.log(divHeight)
             $('#note-info').css('max-height', divHeight - 100)
             for (let doc of e) {
-                // console.log("get",e.id)
-                // let rr = `<li class="list-group-item" style="height: 70px;padding: 16px 15px;">
-                //                 <div style="float:left;">
-                //                     <h4 class="list-group-item-heading" id="${doc.id}" title="${doc.fcontent}" data-name="${doc.fcontent}" style="width:170px;overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${doc.fcontent}</h4>
-                //                     <p class="list-group-item-text">正链：<span class="label label-default">${doc.frontcount}</span>&nbsp&nbsp&nbsp反链：<span class="label label-default">${doc.backcount}</span></p>
-                //                 </div>
-                //                 <div type="button" class="btn btn-default" style="float:right;"><span
-                //                         class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>
-
-                //             </li>`
 
                 let rr = `<div class="list-group-item" style="height: 70px;padding: 16px 15px;">
                         <div style="float:left;">
@@ -298,10 +210,6 @@ $(function () {
         let id = $(this).parent().parent().parent().prev().children('h4').prop('id')
         // let id = $(this).prev().children('h4').prop('id')
         let title = $(this).text()
-        // let data = graph.save()
-        // let nodes = data.nodes.map(e => { return { id: e.id, label: e.label } })
-        // let edges = data.edges.map(e => { return { source: e.source, target: e.target } })
-        // console.log(11, id, 22, desc, title)
         switch (title) {
             case "添加节点":
                 addNode(graph, id, desc);
@@ -383,18 +291,6 @@ window.onload = function () {
             console.log("当前不在思源文档内部")
         }
     }, 2000) // 延时，需要等待挂件块id入库，不然getBlockByID查不到数据
-    // setTimeout(function () {
-    //     try {
-    //         let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
-    //         getBlockByID(nodeid).then(e => {
-    //             expand1LayerOfRelationship(e.root_id, graph)
-    //         })
-    //     } catch (err) {
-    //         console.warn(err);
-    //         console.log("当前不在思源文档内部")
-    //     }
-    // }, 2000) // 延时，需要等待挂件块id入库，不然getBlockByID查不到数据
-
 }
 
 
@@ -414,20 +310,6 @@ window.importData = function (files) {
 }
 
 // 下载文件/保存数据
-// window.saveData = function () {
-//     let graphData = graph.save()
-//     let saveData = {}
-//     saveData.nodes = graphData.nodes
-//     saveData.edges = graphData.edges
-//     console.log("saveData", saveData)
-//     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
-//     let downloadAnchorNode = document.createElement('a')
-//     downloadAnchorNode.setAttribute("href", dataStr);
-//     downloadAnchorNode.setAttribute("download", "result.json")
-//     downloadAnchorNode.click();
-//     downloadAnchorNode.remove();
-// }
-
 window.saveData = async function () {
     let graphData = graph.save()
     let saveData = {}
