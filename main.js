@@ -7,7 +7,8 @@ import {
     delNodeEdge,
     getDocInfoByKey2,
     getDocCount,
-    getAllLinks
+    getAllLinks,
+    updateNodeToMain
 } from "./src/js/base.js"
 import {
     expand1LayerOfRelationship,
@@ -356,10 +357,14 @@ window.onload = function () {
     setTimeout(async function () {
         try {
             let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
-            await fetch(`/widgets/graph-data/data-${nodeid}.json`).then(res => {
+            await fetch(`${config.dataSavePath}/graph-${nodeid}.json`).then(res => {
                 if (res.status == 404) {
-                    getBlockByID(nodeid).then(e => {
-                        expand1LayerOfRelationship(e.root_id, graph)
+                    getBlockByID(nodeid).then(async e => {
+                        // addNode(graph,e.root_id,'')
+                        
+                        await expand1LayerOfRelationship(e.root_id, graph)
+                        await updateNodeToMain(graph,e.root_id)
+                        
                     })
                 } else {
                     return res
@@ -432,9 +437,9 @@ window.saveData = async function () {
     try {
         let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
         let saveDataBlob = new Blob([JSON.stringify(saveData)], { type: 'application/json' })
-        let 数据文件 = new File([saveDataBlob], `dataf${nodeid}.json`, { lastModified: Date.now() })
+        let 数据文件 = new File([saveDataBlob], `graphf${nodeid}.json`, { lastModified: Date.now() })
         let data = new FormData
-        data.append('assetsDirPath', '/widgets/graph-data/')
+        data.append('assetsDirPath', config.dataSavePath)
         data.append('file[]', 数据文件)
         let url = '/api/asset/upload'
         // let filepath = ""
@@ -446,6 +451,7 @@ window.saveData = async function () {
             console.log(response)
             return response.json()
         })
+        alert('保存成功')
     } catch {
         let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
         let downloadAnchorNode = document.createElement('a')

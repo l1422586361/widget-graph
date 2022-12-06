@@ -71,7 +71,15 @@ export var config = {
             stroke: "#FF9999",
         },
     },
+    mainNodeStyle: {
+        style: {
+            fill: "#FF6600",
+            shadowColor: "#FF6600",
+            stroke: "#FF6600",
+        },
+    },
     queryBlockType: ['d'],  // 查询的块类型筛选，仅保留文档块，避免太多干扰信息
+    dataSavePath: '/assets/graph-data',
 }
 
 

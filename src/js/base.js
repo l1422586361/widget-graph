@@ -57,6 +57,12 @@ export async function updateNodeTo1(obj, id) {
 
 }
 
+export async function updateNodeToMain(obj,id){
+    let item = obj.findById(id)
+    let model = config.mainNodeStyle
+    obj.updateItem(item,model)
+}
+
 
 // 增加关系
 export async function addEdge(obj, source_id, target_id) {
