@@ -1,5 +1,5 @@
 import { config, } from "./src/js/config.js"
-import { getBacklink, getBlockByID, } from "./src/utils/api.js"
+import { getBacklink, getBlockByID, sql, } from "./src/utils/api.js"
 import {
     addEdge,
     addNode,
@@ -8,6 +8,7 @@ import {
     getDocInfoByKey2,
     getDocCount,
     getAllLinks,
+    getAllNodes,
     updateNodeToMain
 } from "./src/js/base.js"
 import {
@@ -269,10 +270,10 @@ window.onload = function () {
                 if (res.status == 404) {
                     getBlockByID(nodeid).then(async e => {
                         // addNode(graph,e.root_id,'')
-                        
+
                         await expand1LayerOfRelationship(e.root_id, graph)
-                        await updateNodeToMain(graph,e.root_id)
-                        
+                        await updateNodeToMain(graph, e.root_id)
+
                     })
                 } else {
                     return res
@@ -384,7 +385,18 @@ window.clearGraph = function () {
 
 // 展示全局关系图
 window.getAllLinksToGraph = function () {
+
     let graphData = config.data
+    if (config.showLonelyNode) {
+        getAllNodes().then(nodes => {
+            nodes.forEach(node => {
+                let n = { id: node.id, label: node.fcontent }
+                if (graphData.nodes.map(e => { return e.id }).indexOf(n.id) === -1) {
+                    graphData.nodes.push(n)
+                }
+            });
+        })
+    }
     getAllLinks().then(e => {
         for (let link of e) {
             let sourceNode = { id: link.sourceId, label: link.sourceDesc }

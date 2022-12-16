@@ -183,7 +183,14 @@ export function setArrToJson(arr, nodes, edges) {
 
 // ------------ 思源方法 -----------
 
-
+export async function getAllNodes(){
+    let type = blockType.join('\',\'')
+    let sqldata = `select id,fcontent from blocks where type in ('${type}')`
+    return await sql(sqldata).then(res => {
+        // console.log(res)
+        return res
+    })
+}
 
 const ignoreNote = config.ignoreNote.join('\',\'')
 

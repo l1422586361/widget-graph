@@ -80,6 +80,7 @@ export var config = {
     },
     queryBlockType: ['d'],  // 查询的块类型筛选，仅保留文档块，避免太多干扰信息
     dataSavePath: '/assets/graph-data',
+    showLonelyNode: false, // 是否显示孤立节点
 }
 
 
