@@ -7,10 +7,12 @@ import ToolsBarVue from "./components/ToolsBar.vue";
 </script>
 
 <template>
-<BoardVue></BoardVue>
-<ToolsBarVue></ToolsBarVue>
+  <!-- <ToolsBarVue></ToolsBarVue> -->
+  <BoardVue>
+  </BoardVue>
 </template>
 
 <style scoped>
+
 
 </style>
