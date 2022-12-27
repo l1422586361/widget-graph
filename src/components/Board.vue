@@ -4,11 +4,11 @@ import G6 from '@antv/g6'
 
 // } from '/src/utils/api.js'
 import { onMounted, provide, watch, ref, reactive } from 'vue';
-import {
-    画布数据, 画布配置, useGraphOptions, useGraphMenu
-} from '../data/config.js';
+import { useGraphMenu } from '../data/useGraphMenu.js';
+import {useGraphOptions} from '../data/useGraphOptions.js'
+import { useInitData } from '../data/useInitData.js'
 import ToolsBar from './ToolsBar.vue';
-
+import { hasNode } from '../js/base.js'
 
 let myGraph
 let data
@@ -34,7 +34,7 @@ onMounted(() => {
 
 const createGraph = () => {
     // const container = this.container
-    data = reactive(画布数据)
+    data = reactive(useInitData())
     // let container = document.getElementById('mountNode')
     pageWidth = document.documentElement.clientWidth
     pageHeight = document.documentElement.clientHeight
@@ -47,6 +47,17 @@ const createGraph = () => {
 }
 
 
+async function addnode(id,desc){
+    // 增加普通节点
+    let nodeInfo = { id: id, label: desc }
+    var value = await hasNode(myGraph,id)
+    if (value === false) {
+        // console.log("添加节点",Date(),nodeInfo)
+        myGraph.addItem('node', nodeInfo)
+        myGraph.changeData(myGraph.save())
+        // console.log(myGraph.save())
+    }
+}
 
 
 
@@ -60,7 +71,9 @@ const createGraph = () => {
             <!-- <button @click="toggleSearch">测试搜索</button>
         <button @click="toggleInfo">测试信息</button> -->
         </div>
-        <ToolsBar></ToolsBar>
+        <ToolsBar
+            @addNode="addnode"
+        ></ToolsBar>
 
 
 </template>

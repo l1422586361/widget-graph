@@ -8,7 +8,7 @@ const blockType = config.queryBlockType
 
 // ------------ g6引擎封装函数 -----------
 
-async function hasNode(obj, id) {
+export async function hasNode(obj, id) {
     // 判断是否已有节点
     let findNode = obj.find('node', (node) => {
         return node.get('model').id === id;
