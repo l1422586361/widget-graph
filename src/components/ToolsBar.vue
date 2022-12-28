@@ -1,10 +1,14 @@
 
 <script setup>
-import { ref, onMounted, watch,defineProps,defineEmits } from 'vue'
+import { ref, onMounted, watch, defineProps, defineEmits, defineComponent } from 'vue'
 import { useToolsItem } from '../data/useToolsItem.js'
 import { Search } from '@element-plus/icons-vue'
 import { fullTextSearchBlock } from '../utils/api.js'
-import { getDocSort } from '../js/base.js'
+import { getDocSort, updateNodeTo1 } from '../js/base.js'
+import { hasNode } from '../js/base.js'
+
+
+
 let showRightWindows = ref('')
 let toolItem = ref(useToolsItem())
 let drawer = ref(false)
@@ -15,8 +19,20 @@ let input1 = ref('')
 const nodeInfos = ref([]) // 关键字查询结果
 
 
-defineEmits(['addNode'])
 
+const emit = defineEmits(['addNode', 'update:graphData'])
+
+const props = defineProps(
+    {
+        graphData: {
+            type: Object,
+            default: () => { },
+        },
+        myGraph: {
+            type: Object,
+            default: () => {},
+        }
+    })
 
 
 
@@ -49,12 +65,46 @@ async function getNodeByStr(str) {
     })
 }
 
+// function test() {
+//     // 调用更新数据示例
+//     console.log(111, props.graphData)
+//     props.graphData.nodes.push({ id: 'node3', label: 'Node 3' })
+//     emit('update:graphData', props.graphData)
+//     // console.log(222,props.graphData)
+// }
 
+// function test2(){
+//     // 调用更新画布实例示例
+//     let data = {
+//         nodes: [{id:'111',label:'2222'}],
+//         edges:[]
+//     }
+//     props.myGraph.changeData(data)
+// }
+
+
+async function addNode(id,desc){
+    // 增加普通节点
+    let nodeInfo = { id: id, label: desc }
+    var value = await hasNode(props.graphData,id)
+    console.log(value)
+    if (value === false) {
+        // console.log("添加节点",Date(),nodeInfo)
+        // props.myGraph.addItem('node', nodeInfo)
+        // props.myGraph.changeData(myGraph.save())
+        // console.log(myGraph.save())
+        props.graphData.nodes.push(nodeInfo)
+        console.log(props.graphData)
+        emit('update:graphData', props.graphData)
+    }
+}
 
 </script>
 
 <template>
     <template class="btn-group">
+        <!-- <button @click="test()">1111</button>
+        <button @click="test2()">11121</button> -->
         <el-button-group class="ml-4" size="default" v-for="tool in toolItem">
             <el-tooltip class="box-item" effect="dark" :content="tool.title" placement="top">
                 <el-button v-if="tool.enable" :icon="tool.icon" @click="toggleRightWindows(tool.name)" />
@@ -69,11 +119,11 @@ async function getNodeByStr(str) {
                 <h4>全局搜索</h4>
             </div> -->
             <el-input v-model="input1" class="w-50 m-2" placeholder="请输入关键字，回车即触发查询" :prefix-icon="Search" clearable
-            @keyup.enter="getNodeByStr(input1)" />
+                @keyup.enter="getNodeByStr(input1)" />
 
         </template>
 
-        
+
         <el-card class="box-card" v-if="nodeInfos.length > 1">
             <template #header>
                 <div class="card-header">
@@ -87,15 +137,15 @@ async function getNodeByStr(str) {
                         size="default">
                         <template #extra>
                             <el-button-group class="ml-4" size="default">
-                                <el-button size="small" @click="$emit('addNode',info.id,info.fcontent)">+1</el-button>
+                                <el-button size="small" @click="addNode(info.id, info.fcontent)">+1</el-button>
                                 <el-button size="small">+2</el-button>
                                 <el-button size="small">+3</el-button>
                             </el-button-group>
                         </template>
                         <el-descriptions-item label="反链"><el-tag size="small">{{ info.backcount
-                        }}</el-tag></el-descriptions-item>
+}}</el-tag></el-descriptions-item>
                         <el-descriptions-item label="正链"><el-tag size="small">{{ info.frontcount
-                        }}</el-tag></el-descriptions-item>
+}}</el-tag></el-descriptions-item>
                         <!-- <el-descriptions-item label="">按钮</el-descriptions-item> -->
                     </el-descriptions>
                 </el-tooltip>
@@ -127,6 +177,7 @@ async function getNodeByStr(str) {
         <template #footer>
         </template>
     </el-drawer>
+
 </template>
 
 <style scoped>

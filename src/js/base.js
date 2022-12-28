@@ -8,18 +8,29 @@ const blockType = config.queryBlockType
 
 // ------------ g6引擎封装函数 -----------
 
-export async function hasNode(obj, id) {
-    // 判断是否已有节点
-    let findNode = obj.find('node', (node) => {
-        return node.get('model').id === id;
-    });
-    // console.log("findNode", findNode)
-    if (findNode === undefined) {
+// export async function hasNode(obj, id) {
+//     // 判断是否已有节点
+//     let findNode = obj.find('node', (node) => {
+//         return node.get('model').id === id;
+//     });
+//     // console.log("findNode", findNode)
+//     if (findNode === undefined) {
+//         return false
+//     } else {
+//         return true
+//     }
+// }
+
+
+export async function hasNode(graphData,id){
+    if(graphData.nodes.map(e=>{return e.id}).indexOf(id)=== -1){
         return false
-    } else {
+    }else{
         return true
     }
+    
 }
+
 
 async function hasEdge(obj, source_id, target_id) {
     // 判断是否已有边

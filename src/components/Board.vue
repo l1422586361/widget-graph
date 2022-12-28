@@ -8,14 +8,16 @@ import { useGraphMenu } from '../data/useGraphMenu.js';
 import {useGraphOptions} from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import ToolsBar from './ToolsBar.vue';
-import { hasNode } from '../js/base.js'
+
 
 let myGraph
 let data
 let pageHeight
 let pageWidth
 
-
+const graphData = ref(
+    useInitData()
+)
 
 onMounted(() => {
     createGraph()
@@ -47,19 +49,12 @@ const createGraph = () => {
 }
 
 
-async function addnode(id,desc){
-    // 增加普通节点
-    let nodeInfo = { id: id, label: desc }
-    var value = await hasNode(myGraph,id)
-    if (value === false) {
-        // console.log("添加节点",Date(),nodeInfo)
-        myGraph.addItem('node', nodeInfo)
-        myGraph.changeData(myGraph.save())
-        // console.log(myGraph.save())
-    }
+
+
+function updateGraphData(v){
+    // console.log(v)
+    myGraph.changeData(v)
 }
-
-
 
 
 </script>
@@ -72,7 +67,9 @@ async function addnode(id,desc){
         <button @click="toggleInfo">测试信息</button> -->
         </div>
         <ToolsBar
-            @addNode="addnode"
+            v-bind:graphData="graphData"
+            v-on:update:graphData="updateGraphData"
+            v-bind:myGraph="myGraph"
         ></ToolsBar>
 
 
