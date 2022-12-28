@@ -5,7 +5,7 @@ import G6 from '@antv/g6'
 // } from '/src/utils/api.js'
 import { onMounted, provide, watch, ref, reactive } from 'vue';
 import { useGraphMenu } from '../data/useGraphMenu.js';
-import {useGraphOptions} from '../data/useGraphOptions.js'
+import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import ToolsBar from './ToolsBar.vue';
 
@@ -28,6 +28,12 @@ onMounted(() => {
     // },
     //     { deep: true }
     // )
+    window.onresize = function(){
+        let canvasHeight = document.documentElement.clientHeight;
+        let canvasWidth = document.documentElement.clientWidth;
+        // console.log(canvasHeight,canvasWidth)
+        myGraph.changeSize(canvasWidth, canvasHeight)
+    }
 })
 
 
@@ -51,7 +57,7 @@ const createGraph = () => {
 
 
 
-function updateGraphData(v){
+function updateGraphData(v) {
     // console.log(v)
     myGraph.changeData(v)
 }
@@ -60,17 +66,13 @@ function updateGraphData(v){
 </script>
 <template>
 
-        <div id="mountNode">
+    <div id="mountNode">
 
-            <!-- <aButton @click="clickE()"></aButton> -->
-            <!-- <button @click="toggleSearch">测试搜索</button>
+        <!-- <aButton @click="clickE()"></aButton> -->
+        <!-- <button @click="toggleSearch">测试搜索</button>
         <button @click="toggleInfo">测试信息</button> -->
-        </div>
-        <ToolsBar
-            v-bind:graphData="graphData"
-            v-on:update:graphData="updateGraphData"
-            v-bind:myGraph="myGraph"
-        ></ToolsBar>
+    </div>
+    <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData" v-bind:myGraph="myGraph"></ToolsBar>
 
 
 </template>
@@ -81,7 +83,4 @@ function updateGraphData(v){
     width: auto;
     color: aliceblue;
 }
-
-
-
 </style>

@@ -22,28 +22,41 @@ const blockType = config.queryBlockType
 // }
 
 
-export async function hasNode(graphData,id){
-    if(graphData.nodes.map(e=>{return e.id}).indexOf(id)=== -1){
-        return false
-    }else{
-        return true
-    }
-    
-}
-
-
-async function hasEdge(obj, source_id, target_id) {
-    // 判断是否已有边
-    let findEdge = obj.find('edge', (edge) => {
-        return (edge.get('model').source === source_id && edge.get('model').target === target_id);
-    });
-    // console.log("findEdge", findEdge)
-    if (findEdge === undefined) {
+export async function hasNode(graphData, id) {
+    // flase 不存在
+    if (graphData.nodes.map(e => { return e.id }).indexOf(id) === -1) {
         return false
     } else {
         return true
     }
+
 }
+
+export async function hasEdge(graphData, edge) {
+    // flase 不存在
+    if (graphData.edges.map(e => { return e.source }).indexOf(edge.source) === -1) {
+        return false
+    } else if (graphData.edges.map(e => { return e.target }).indexOf(edge.target) === -1) {
+        return false
+    } else {
+        return true
+    }
+
+}
+
+
+// async function hasEdge(obj, source_id, target_id) {
+//     // 判断是否已有边
+//     let findEdge = obj.find('edge', (edge) => {
+//         return (edge.get('model').source === source_id && edge.get('model').target === target_id);
+//     });
+//     // console.log("findEdge", findEdge)
+//     if (findEdge === undefined) {
+//         return false
+//     } else {
+//         return true
+//     }
+// }
 
 
 export async function addNode(obj, id, desc) {
@@ -60,11 +73,11 @@ export async function addNode(obj, id, desc) {
 
 export async function updateNodeTo1(obj, id) {
     // 修改节点样式
-    
+
     let item = obj.findById(id)
     // console.log("updateNodeTo1",item)
     let model = config.extNodeStyle
-    obj.updateItem(item,model)
+    obj.updateItem(item, model)
 
 }
 
@@ -192,19 +205,19 @@ export function setArrToJson(arr, nodes, edges) {
 
 const ignoreNote = config.ignoreNote.join('\',\'')
 
-export async function getAllLinks(id){
+export async function getAllLinks(id) {
     // 加id获取所有基于id的note
     // 不加id获取全局关系
     let type = blockType.join('\',\'')
     let 条件 = ''
     // let ignoreNote = config.ignoreNote.join('\',\'')
-    if (id){
+    if (id) {
         条件 = `and (t1.def_block_id = '${id}' or t1.root_id = '${id}')`
     }
-    if (type){
+    if (type) {
         条件 += `and t2.type in ('${type}') and t3.type in ('${type}')`
     }
-    if (ignoreNote){
+    if (ignoreNote) {
         条件 += `and t1.def_block_id not in ('${ignoreNote}') and t1.root_id not in ('${ignoreNote}')`
     }
     let sqldata = `select t2.box as sourceBox,t3.box as targetBox,t1.def_block_id as sourceId,t2.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1

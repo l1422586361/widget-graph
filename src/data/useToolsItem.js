@@ -1,10 +1,11 @@
-import { Share, Search,
-    Operation,
-    Upload,
-    UploadFilled,
-    Refresh,
-    MagicStick,
-    Delete
+import {
+  Share, Search,
+  Operation,
+  Upload,
+  UploadFilled,
+  Refresh,
+  MagicStick,
+  Delete
 } from "@element-plus/icons-vue";
 import { markRaw } from "vue";
 export function useToolsItem() {
@@ -14,48 +15,56 @@ export function useToolsItem() {
       title: "搜索",
       enable: true,
       icon: markRaw(Search),
+
     },
     {
       name: "Info",
       title: "信息测试",
       enable: true,
       icon: markRaw(Share),
+
     },
     {
-      name: "Info",
+      name: "getAll",
       title: "全局关系图",
       enable: true,
       icon: markRaw(Operation),
+      handler: 'getAllGraph',
     },
     {
       name: "Info",
       title: "导入数据",
       enable: true,
       icon: markRaw(Upload),
+
     },
     {
       name: "Info",
       title: "保存数据",
       enable: true,
       icon: markRaw(UploadFilled),
+
     },
     {
-      name: "Info",
+      name: "flushGraph",
       title: "刷新画布布局",
       enable: true,
       icon: markRaw(Refresh),
+
     },
     {
       name: "Info",
       title: "超级节点高亮",
       enable: true,
       icon: markRaw(MagicStick),
+
     },
     {
       name: "Info",
       title: "清除画布",
       enable: true,
       icon: markRaw(Delete),
+
     },
   ];
 }

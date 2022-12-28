@@ -1,12 +1,16 @@
 
 <script setup>
-import { ref, onMounted, watch, defineProps, defineEmits, defineComponent } from 'vue'
-import { useToolsItem } from '../data/useToolsItem.js'
-import { Search } from '@element-plus/icons-vue'
+import { ref, onMounted, watch, defineComponent, markRaw } from 'vue'
+// import { useToolsItem } from '../data/useToolsItem.js'
+// import { Search } from '@element-plus/icons-vue'
 import { fullTextSearchBlock } from '../utils/api.js'
-import { getDocSort, updateNodeTo1 } from '../js/base.js'
-import { hasNode } from '../js/base.js'
-
+import { getDocSort, } from '../js/base.js'
+import { hasNode, getAllLinks,hasEdge } from '../js/base.js'
+import {
+    Search
+} from "@element-plus/icons-vue";
+import { useInitData } from '../data/useInitData.js';
+import { useToolsItem } from '../data/useToolsItem.js';
 
 
 let showRightWindows = ref('')
@@ -20,7 +24,7 @@ const nodeInfos = ref([]) // 关键字查询结果
 
 
 
-const emit = defineEmits(['addNode', 'update:graphData'])
+const emit = defineEmits(['update:graphData'])
 
 const props = defineProps(
     {
@@ -36,19 +40,46 @@ const props = defineProps(
 
 
 
-function toggleRightWindows(str) {
-    if (str === showRightWindows.value) {
+async function toggleRightWindows(v) {
+    if (v === showRightWindows.value) {
         drawer.value = false
         drawer2.value = false
         showRightWindows.value = ''
         return
     }
-    showRightWindows.value = str
-    if ('Search' === str) {
+    showRightWindows.value = v
+    if ('Search' === v) {
         drawer.value = true
     }
-    if ('Info' === str) {
+    if ('Info' === v) {
         drawer2.value = true
+    }
+    if (v === 'getAll') {
+        // console.log(111)
+        // console.log(props.graphData)
+        await getAllLinks().then(async e => {
+            // console.log(e)
+            for (let link of e) {
+                let sourceNode = { id: link.sourceId, label: link.sourceDesc }
+                let targetNode = { id: link.targetId, label: link.targetDesc }
+                let edge = { source: link.targetId, target: link.sourceId }
+                if(!await hasNode(props.graphData,sourceNode.id)){
+                    props.graphData.nodes.push(sourceNode)
+                }
+                if(!await hasNode(props.graphData,targetNode.id)){
+                    props.graphData.nodes.push(targetNode)
+                }
+                if(!await hasEdge(props.graphData,edge)){
+                    props.graphData.edges.push(edge)
+                }
+            }
+            
+        })
+        // console.log(props.graphData)
+        emit('update:graphData', props.graphData)
+    }
+    if(v==='flushGraph'){
+        props.myGraph.layout()
     }
 
 }
@@ -59,30 +90,30 @@ async function getNodeByStr(str) {
         let matchs = []   // 添加匹配块计数
         let nodeIds = []
         for (let doc of e.blocks) {
-            matchs.push({id:doc.id,length:doc.children.length})
+            matchs.push({ id: doc.id, length: doc.children.length })
             nodeIds.push(doc.id)
         }
         let nodes = await getDocSort(nodeIds)
-        for(let n of nodes){
-            for(let count of matchs){ // 添加匹配块计数
-                if(count.id === n.id){
+        for (let n of nodes) {
+            for (let count of matchs) { // 添加匹配块计数
+                if (count.id === n.id) {
                     n.length = count.length
                 }
             }
         }
         // console.log(nodes)
         // console.log(nodeInfos.value)
-        nodes.sort((a,b)=>{ // 依次对3个计数倒序排序
-            if(a.backcount > b.backcount) return -1;
-            if(a.backcount < b.backcount) return 1;
-            if(a.frontcount > b.frontcount) return -1;
-            if(a.frontcount < b.frontcount) return 1;
-            if(a.length > b.length) return -1;
-            if(a.length < b.length) return 1;
+        nodes.sort((a, b) => { // 依次对3个计数倒序排序
+            if (a.backcount > b.backcount) return -1;
+            if (a.backcount < b.backcount) return 1;
+            if (a.frontcount > b.frontcount) return -1;
+            if (a.frontcount < b.frontcount) return 1;
+            if (a.length > b.length) return -1;
+            if (a.length < b.length) return 1;
             return 0
         })
         nodeInfos.value = nodes
-        
+
         // console.log(nodeInfos)
     })
 }
@@ -105,7 +136,7 @@ async function getNodeByStr(str) {
 // }
 
 
-async function addNode(id, desc) {
+async function add1Node(id, desc) {
     // 增加普通节点
     let nodeInfo = { id: id, label: desc }
     var value = await hasNode(props.graphData, id)
@@ -120,6 +151,7 @@ async function addNode(id, desc) {
         emit('update:graphData', props.graphData)
     }
 }
+
 
 </script>
 
@@ -158,7 +190,7 @@ async function addNode(id, desc) {
                     <el-descriptions class="result-list" :title="info.fcontent.slice(0, 10)" :column="3" size="default">
                         <template #extra>
                             <el-button-group class="ml-4" size="default">
-                                <el-button size="small" @click="addNode(info.id, info.fcontent)">+1</el-button>
+                                <el-button size="small" @click="add1Node(info.id, info.fcontent)">+1</el-button>
                                 <el-button size="small">+2</el-button>
                                 <el-button size="small">+3</el-button>
                             </el-button-group>
@@ -167,7 +199,8 @@ async function addNode(id, desc) {
 }}</el-tag></el-descriptions-item>
                         <el-descriptions-item label="正链"><el-tag size="small">{{ info.frontcount
 }}</el-tag></el-descriptions-item>
-                        <el-descriptions-item label="命中子块"><el-tag size="small">{{ info.length }}</el-tag></el-descriptions-item>
+                        <el-descriptions-item label="命中子块"><el-tag size="small">{{ info.length
+}}</el-tag></el-descriptions-item>
                         <!-- <el-descriptions-item label="">按钮</el-descriptions-item> -->
                     </el-descriptions>
                 </el-tooltip>
