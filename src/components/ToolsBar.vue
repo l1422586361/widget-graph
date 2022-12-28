@@ -30,7 +30,7 @@ const props = defineProps(
         },
         myGraph: {
             type: Object,
-            default: () => {},
+            default: () => { },
         }
     })
 
@@ -56,11 +56,33 @@ function toggleRightWindows(str) {
 async function getNodeByStr(str) {
     // 查询关键字获取文档
     await fullTextSearchBlock(str).then(async e => {
+        let matchs = []   // 添加匹配块计数
         let nodeIds = []
         for (let doc of e.blocks) {
+            matchs.push({id:doc.id,length:doc.children.length})
             nodeIds.push(doc.id)
         }
-        nodeInfos.value = await getDocSort(nodeIds)
+        let nodes = await getDocSort(nodeIds)
+        for(let n of nodes){
+            for(let count of matchs){ // 添加匹配块计数
+                if(count.id === n.id){
+                    n.length = count.length
+                }
+            }
+        }
+        // console.log(nodes)
+        // console.log(nodeInfos.value)
+        nodes.sort((a,b)=>{ // 依次对3个计数倒序排序
+            if(a.backcount > b.backcount) return -1;
+            if(a.backcount < b.backcount) return 1;
+            if(a.frontcount > b.frontcount) return -1;
+            if(a.frontcount < b.frontcount) return 1;
+            if(a.length > b.length) return -1;
+            if(a.length < b.length) return 1;
+            return 0
+        })
+        nodeInfos.value = nodes
+        
         // console.log(nodeInfos)
     })
 }
@@ -83,10 +105,10 @@ async function getNodeByStr(str) {
 // }
 
 
-async function addNode(id,desc){
+async function addNode(id, desc) {
     // 增加普通节点
     let nodeInfo = { id: id, label: desc }
-    var value = await hasNode(props.graphData,id)
+    var value = await hasNode(props.graphData, id)
     console.log(value)
     if (value === false) {
         // console.log("添加节点",Date(),nodeInfo)
@@ -133,8 +155,7 @@ async function addNode(id,desc){
             </template>
             <div v-for="info in nodeInfos" :key="info.id" class="text item">
                 <el-tooltip class="box-item" effect="dark" :content="info.fcontent" placement="left-start">
-                    <el-descriptions class="result-list" :title="info.fcontent.slice(0, 15) + '...'" :column="2"
-                        size="default">
+                    <el-descriptions class="result-list" :title="info.fcontent.slice(0, 10)" :column="3" size="default">
                         <template #extra>
                             <el-button-group class="ml-4" size="default">
                                 <el-button size="small" @click="addNode(info.id, info.fcontent)">+1</el-button>
@@ -146,6 +167,7 @@ async function addNode(id,desc){
 }}</el-tag></el-descriptions-item>
                         <el-descriptions-item label="正链"><el-tag size="small">{{ info.frontcount
 }}</el-tag></el-descriptions-item>
+                        <el-descriptions-item label="命中子块"><el-tag size="small">{{ info.length }}</el-tag></el-descriptions-item>
                         <!-- <el-descriptions-item label="">按钮</el-descriptions-item> -->
                     </el-descriptions>
                 </el-tooltip>
@@ -202,6 +224,10 @@ async function addNode(id,desc){
 
 .result-list {
     border-bottom: solid 1px var(--el-card-border-color);
+    /* width:300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; */
 }
 
 .btn-group {

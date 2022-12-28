@@ -20,43 +20,43 @@ export default defineConfig({
     host: '0.0.0.0',
     proxy: {
       "/stage": {
-        target: "http://127.0.0.1:6807/stage",
+        target: "http://127.0.0.1:6806/stage",
         changeOrigin: true,
         rewrite: path => path.replace(/^\/stage/, '')
       },
       "/stage/js": {
-        target: "http://127.0.0.1:6807/stage/js",
+        target: "http://127.0.0.1:6806/stage/js",
         changeOrigin: true,
         rewrite: path => path.replace(/^\/stage/, '')
       },
       "/widgets": {
-        target: "http://127.0.0.1:6807/widgets",
+        target: "http://127.0.0.1:6806/widgets",
         changeOrigin: true,
         rewrite: path => path.replace(/^\/widgets/, '')
       },
 
       "/api": {
-        target: "http://127.0.0.1:6807/api",
+        target: "http://127.0.0.1:6806/api",
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, '')
       },
       "/assets": {
-        target: "http://127.0.0.1:6807/assets",
+        target: "http://127.0.0.1:6806/assets",
         changeOrigin: true,
         rewrite: path => path.replace(/^\/assets/, '')
       },
       "/appearance": {
-        target: "http://127.0.0.1:6807/appearance",
+        target: "http://127.0.0.1:6806/appearance",
         changeOrigin: true,
         rewrite: path => path.replace(/^\/appearance/, '')
       },
       "/snippets": {
-        target: "http://127.0.0.1:6807/snippets",
+        target: "http://127.0.0.1:6806/snippets",
         changeOrigin: true,
         rewrite: path => path.replace(/^\/snippets/, '')
       },
       "/ws": {
-        target: "ws://127.0.0.1:6807/ws",
+        target: "ws://127.0.0.1:6806/ws",
         changeOrigin: true,
         ws: true,
         rewrite: path => path.replace(/^\/ws/, '')

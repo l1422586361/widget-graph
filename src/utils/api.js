@@ -74,18 +74,19 @@ async function fullTextSearchBlock(k){
     // 全文检索，仅输出文档块
     let data = {
         "query": k,
+        groupBy: 1,
         "types": {
             "document": true,
-            "heading": false,
-            "list": false,
-            "listItem": false,
-            "codeBlock": false,
-            "htmlBlock": false,
-            "mathBlock": false,
-            "table": false,
-            "blockquote": false,
-            "superBlock": false,
-            "paragraph": false
+            "heading": true,
+            "list": true,
+            "listItem": true,
+            "codeBlock": true,
+            "htmlBlock": true,
+            "mathBlock": true,
+            "table": true,
+            "blockquote": true,
+            "superBlock": true,
+            "paragraph": true
         },
         "path": ""
     }
