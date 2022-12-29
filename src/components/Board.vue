@@ -3,7 +3,7 @@ import G6 from '@antv/g6'
 // import {
 
 // } from '/src/utils/api.js'
-import { onMounted, provide, watch, ref, reactive } from 'vue';
+import { onMounted, provide, watch, ref, reactive,inject } from 'vue';
 import { useGraphMenu } from '../data/useGraphMenu.js';
 import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
@@ -14,6 +14,8 @@ let myGraph
 let data
 let pageHeight
 let pageWidth
+const activeNode = reactive({})
+let toolsBarRef = ref(null)
 
 const graphData = ref(
     useInitData()
@@ -28,7 +30,7 @@ onMounted(() => {
     // },
     //     { deep: true }
     // )
-    window.onresize = function(){
+    window.onresize = function () {
         let canvasHeight = document.documentElement.clientHeight;
         let canvasWidth = document.documentElement.clientWidth;
         // console.log(canvasHeight,canvasWidth)
@@ -52,6 +54,14 @@ const createGraph = () => {
     myGraph.data(data)
     myGraph.render()
     // this.myGraph = myGraph || null
+
+    myGraph.on('node:click', (evt) => {
+        let id = evt.item._cfg.id
+        console.log(12314,id)
+        activeNode.id = id
+        // this.$refs.ToolsBar.toggleRightWindows('Info')
+        toolsBarRef.value.toggleRightWindows('Info')
+    })
 }
 
 
@@ -72,7 +82,8 @@ function updateGraphData(v) {
         <!-- <button @click="toggleSearch">测试搜索</button>
         <button @click="toggleInfo">测试信息</button> -->
     </div>
-    <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData" v-bind:myGraph="myGraph"></ToolsBar>
+    <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData" v-bind:myGraph="myGraph"
+        :activeNode="activeNode" ref="toolsBarRef"></ToolsBar>
 
 
 </template>

@@ -1,11 +1,11 @@
 
 <script setup>
-import { ref, onMounted, watch, defineComponent, markRaw } from 'vue'
+import { ref, onMounted, watch, reactive } from 'vue'
 // import { useToolsItem } from '../data/useToolsItem.js'
 // import { Search } from '@element-plus/icons-vue'
-import { fullTextSearchBlock } from '../utils/api.js'
-import { getDocSort, } from '../js/base.js'
-import { hasNode, getAllLinks,hasEdge } from '../js/base.js'
+import { fullTextSearchBlock, getBlockByID } from '../utils/api.js'
+import { getDocCount, getDocSort, } from '../js/base.js'
+import { hasNode, getAllLinks, hasEdge } from '../js/base.js'
 import {
     Search
 } from "@element-plus/icons-vue";
@@ -20,12 +20,15 @@ let drawer2 = ref(false)
 let modal = ref(false) // 窗口遮罩
 let size = ref('400px')
 let input1 = ref('')
-const nodeInfos = ref([]) // 关键字查询结果
+const nodeLists = ref([]) // 关键字查询结果
+const nodeInfo = reactive({})
 
 
 
 const emit = defineEmits(['update:graphData'])
-
+defineExpose({
+    toggleRightWindows,
+})
 const props = defineProps(
     {
         graphData: {
@@ -33,6 +36,10 @@ const props = defineProps(
             default: () => { },
         },
         myGraph: {
+            type: Object,
+            default: () => { },
+        },
+        activeNode: {
             type: Object,
             default: () => { },
         }
@@ -53,6 +60,27 @@ async function toggleRightWindows(v) {
     }
     if ('Info' === v) {
         drawer2.value = true
+        let id = props.activeNode.id
+        console.log(props.activeNode)
+        if (id) {
+            Promise.all([getBlockByID(id), getDocCount(id)]).then(e => {
+                nodeInfo.id = id
+                nodeInfo.name = e[0].fcontent
+                nodeInfo.created = e[0].created
+                nodeInfo.updated = e[0].updated
+                nodeInfo.frontLinkCount = e[1][0].frontcount
+                nodeInfo.backLinkCount = e[1][0].backcount
+                nodeInfo.url = 'siyuan://blocks/' + id
+            })
+            console.log(nodeInfo)
+        }
+    }
+    if (v === 'test') {
+        let node = { id: '20220606093400-r0y6l0z', label: '111111' }
+        if (!await hasNode(props.graphData, node.id)) {
+            props.graphData.nodes.push(node)
+        }
+        emit('update:graphData', props.graphData)
     }
     if (v === 'getAll') {
         // console.log(111)
@@ -63,22 +91,22 @@ async function toggleRightWindows(v) {
                 let sourceNode = { id: link.sourceId, label: link.sourceDesc }
                 let targetNode = { id: link.targetId, label: link.targetDesc }
                 let edge = { source: link.targetId, target: link.sourceId }
-                if(!await hasNode(props.graphData,sourceNode.id)){
+                if (!await hasNode(props.graphData, sourceNode.id)) {
                     props.graphData.nodes.push(sourceNode)
                 }
-                if(!await hasNode(props.graphData,targetNode.id)){
+                if (!await hasNode(props.graphData, targetNode.id)) {
                     props.graphData.nodes.push(targetNode)
                 }
-                if(!await hasEdge(props.graphData,edge)){
+                if (!await hasEdge(props.graphData, edge)) {
                     props.graphData.edges.push(edge)
                 }
             }
-            
+
         })
         // console.log(props.graphData)
         emit('update:graphData', props.graphData)
     }
-    if(v==='flushGraph'){
+    if (v === 'flushGraph') {
         props.myGraph.layout()
     }
 
@@ -102,7 +130,7 @@ async function getNodeByStr(str) {
             }
         }
         // console.log(nodes)
-        // console.log(nodeInfos.value)
+        // console.log(nodeLists.value)
         nodes.sort((a, b) => { // 依次对3个计数倒序排序
             if (a.backcount > b.backcount) return -1;
             if (a.backcount < b.backcount) return 1;
@@ -112,9 +140,9 @@ async function getNodeByStr(str) {
             if (a.length < b.length) return 1;
             return 0
         })
-        nodeInfos.value = nodes
+        nodeLists.value = nodes
 
-        // console.log(nodeInfos)
+        // console.log(nodeLists)
     })
 }
 
@@ -167,6 +195,11 @@ async function add1Node(id, desc) {
     </template>
 
 
+
+
+
+
+
     <el-drawer v-model="drawer" :size=size :modal="modal">
         <template #header>
             <!-- <div>
@@ -178,14 +211,14 @@ async function add1Node(id, desc) {
         </template>
 
 
-        <el-card class="box-card" v-if="nodeInfos.length > 1">
+        <el-card class="box-card" v-if="nodeLists.length > 1">
             <template #header>
                 <div class="card-header">
                     <b>查询结果</b>
                     <!-- <el-button class="button" text>Operation button</el-button> -->
                 </div>
             </template>
-            <div v-for="info in nodeInfos" :key="info.id" class="text item">
+            <div v-for="info in nodeLists" :key="info.id" class="text item">
                 <el-tooltip class="box-item" effect="dark" :content="info.fcontent" placement="left-start">
                     <el-descriptions class="result-list" :title="info.fcontent.slice(0, 10)" :column="3" size="default">
                         <template #extra>
@@ -211,20 +244,28 @@ async function add1Node(id, desc) {
     </el-drawer>
 
 
-    <el-drawer v-model="drawer2" :size=size :modal="modal">
+
+
+
+
+
+
+    <el-drawer v-model="drawer2" :size=size :modal="modal" v-bind="nodeInfo">
         <template #header>
             <h4>详情</h4>
         </template>
         <template #default>
 
-            <el-descriptions title="文件名称" :column="2" size="default" border>
-                <el-descriptions-item label-align="right" label="id" :span="2">1111111</el-descriptions-item>
-                <el-descriptions-item label-align="right" label="创建时间" :span="2">1111111</el-descriptions-item>
-                <el-descriptions-item label-align="right" label="更新时间" :span="2">1111111</el-descriptions-item>
+            <el-descriptions :title="nodeInfo.name" :column="2" size="default">
+                <el-descriptions-item label-align="right" label="id" :span="2"><el-link :href="nodeInfo.url" target="_blank">{{ nodeInfo.id }}</el-link></el-descriptions-item>
+                <el-descriptions-item label-align="right" label="创建时间"
+                    :span="2">{{ nodeInfo.created }}</el-descriptions-item>
+                <el-descriptions-item label-align="right" label="更新时间"
+                    :span="2">{{ nodeInfo.updated }}</el-descriptions-item>
                 <el-descriptions-item label-align="right" label="反链"><el-tag
-                        size="small">12</el-tag></el-descriptions-item>
+                        size="small">{{ nodeInfo.backLinkCount }}</el-tag></el-descriptions-item>
                 <el-descriptions-item label-align="right" label="正链"><el-tag
-                        size="small">12</el-tag></el-descriptions-item>
+                        size="small">{{ nodeInfo.frontLinkCount }}</el-tag></el-descriptions-item>
                 <!-- <el-descriptions-item label="">按钮</el-descriptions-item> -->
             </el-descriptions>
 

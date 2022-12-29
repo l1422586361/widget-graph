@@ -20,6 +20,13 @@ export function useToolsItem() {
     {
       name: "Info",
       title: "信息测试",
+      enable: false,
+      icon: markRaw(Share),
+
+    },
+    {
+      name: "test",
+      title: "测试",
       enable: true,
       icon: markRaw(Share),
 
@@ -32,14 +39,14 @@ export function useToolsItem() {
       handler: 'getAllGraph',
     },
     {
-      name: "Info",
+      name: "Import",
       title: "导入数据",
       enable: true,
       icon: markRaw(Upload),
 
     },
     {
-      name: "Info",
+      name: "Save",
       title: "保存数据",
       enable: true,
       icon: markRaw(UploadFilled),
@@ -53,14 +60,14 @@ export function useToolsItem() {
 
     },
     {
-      name: "Info",
+      name: "NodeLight",
       title: "超级节点高亮",
       enable: true,
       icon: markRaw(MagicStick),
 
     },
     {
-      name: "Info",
+      name: "Clear",
       title: "清除画布",
       enable: true,
       icon: markRaw(Delete),
