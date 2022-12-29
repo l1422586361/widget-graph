@@ -24,8 +24,7 @@ const nodeLists = ref([]) // 关键字查询结果
 const nodeInfo = reactive({})
 
 
-
-const emit = defineEmits(['update:graphData'])
+const emit = defineEmits(['update:graphData','flushGraphLayout','changeSizeGraph'])
 defineExpose({
     toggleRightWindows,
 })
@@ -35,17 +34,27 @@ const props = defineProps(
             type: Object,
             default: () => { },
         },
-        myGraph: {
-            type: Object,
-            default: () => { },
-        },
         activeNode: {
             type: Object,
             default: () => { },
         }
     })
 
+async function addNode(node) {
+    if (!await hasNode(props.graphData, node.id)) {
+        props.graphData.nodes.push(node)
+    }
+}
 
+async function addEdge(edge) {
+    if (!await hasEdge(props.graphData, edge)) {
+        props.graphData.edges.push(edge)
+    }
+}
+
+function updateGraphData() {
+    emit('update:graphData', props.graphData)
+}
 
 async function toggleRightWindows(v) {
     if (v === showRightWindows.value) {
@@ -77,11 +86,11 @@ async function toggleRightWindows(v) {
     }
     if (v === 'test') {
         let node = { id: '20220606093400-r0y6l0z', label: '111111' }
-        if (!await hasNode(props.graphData, node.id)) {
-            props.graphData.nodes.push(node)
-        }
-        emit('update:graphData', props.graphData)
+        await addNode(node)
+        updateGraphData()
+        // test2()
     }
+
     if (v === 'getAll') {
         // console.log(111)
         // console.log(props.graphData)
@@ -91,23 +100,19 @@ async function toggleRightWindows(v) {
                 let sourceNode = { id: link.sourceId, label: link.sourceDesc }
                 let targetNode = { id: link.targetId, label: link.targetDesc }
                 let edge = { source: link.targetId, target: link.sourceId }
-                if (!await hasNode(props.graphData, sourceNode.id)) {
-                    props.graphData.nodes.push(sourceNode)
-                }
-                if (!await hasNode(props.graphData, targetNode.id)) {
-                    props.graphData.nodes.push(targetNode)
-                }
-                if (!await hasEdge(props.graphData, edge)) {
-                    props.graphData.edges.push(edge)
-                }
+                await addNode(sourceNode)
+                await addNode(targetNode)
+                await addEdge(edge)
             }
 
         })
         // console.log(props.graphData)
-        emit('update:graphData', props.graphData)
+        // emit('update:graphData', props.graphData)
+        updateGraphData()
     }
     if (v === 'flushGraph') {
-        props.myGraph.layout()
+        // props.myGraph.layout()
+        emit('flushGraphLayout')
     }
 
 }
@@ -146,22 +151,6 @@ async function getNodeByStr(str) {
     })
 }
 
-// function test() {
-//     // 调用更新数据示例
-//     console.log(111, props.graphData)
-//     props.graphData.nodes.push({ id: 'node3', label: 'Node 3' })
-//     emit('update:graphData', props.graphData)
-//     // console.log(222,props.graphData)
-// }
-
-// function test2(){
-//     // 调用更新画布实例示例
-//     let data = {
-//         nodes: [{id:'111',label:'2222'}],
-//         edges:[]
-//     }
-//     props.myGraph.changeData(data)
-// }
 
 
 async function add1Node(id, desc) {
@@ -178,6 +167,23 @@ async function add1Node(id, desc) {
         console.log(props.graphData)
         emit('update:graphData', props.graphData)
     }
+}
+
+async function onOpen(){
+    let canvasHeight = document.documentElement.clientHeight;
+    let canvasWidth = document.documentElement.clientHeight - 400;
+    console.log(canvasHeight,canvasWidth)
+    // await props.myGraph.changeSize(canvasWidth,canvasHeight)
+    // emit('changeSizeGraph',canvasWidth,canvasHeight)
+}
+async function onClose(){
+    let canvasHeight = document.documentElement.clientHeight;
+    let canvasWidth = document.documentElement.clientHeight;
+    console.log(canvasHeight,canvasWidth)
+    drawer2.value = false
+    showRightWindows.value = ''
+    // await props.myGraph.changeSize(canvasWidth,canvasHeight)
+    // emit('changeSizeGraph',canvasWidth,canvasHeight)
 }
 
 
@@ -224,8 +230,8 @@ async function add1Node(id, desc) {
                         <template #extra>
                             <el-button-group class="ml-4" size="default">
                                 <el-button size="small" @click="add1Node(info.id, info.fcontent)">+1</el-button>
-                                <el-button size="small">+2</el-button>
-                                <el-button size="small">+3</el-button>
+                                <el-button size="small" @click="add2Node(info.id, info.fcontent)">+2</el-button>
+                                <el-button size="small" @click="add3Node(info.id, info.fcontent)">+3</el-button>
                             </el-button-group>
                         </template>
                         <el-descriptions-item label="反链"><el-tag size="small">{{ info.backcount
@@ -250,23 +256,19 @@ async function add1Node(id, desc) {
 
 
 
-    <el-drawer v-model="drawer2" :size=size :modal="modal" v-bind="nodeInfo">
-        <template #header>
-            <h4>详情</h4>
-        </template>
+    <el-drawer v-model="drawer2" :size=size :modal="modal" @open="onOpen" @close="onClose">
         <template #default>
-
             <el-descriptions :title="nodeInfo.name" :column="2" size="default">
-                <el-descriptions-item label-align="right" label="id" :span="2"><el-link :href="nodeInfo.url" target="_blank">{{ nodeInfo.id }}</el-link></el-descriptions-item>
-                <el-descriptions-item label-align="right" label="创建时间"
-                    :span="2">{{ nodeInfo.created }}</el-descriptions-item>
-                <el-descriptions-item label-align="right" label="更新时间"
-                    :span="2">{{ nodeInfo.updated }}</el-descriptions-item>
-                <el-descriptions-item label-align="right" label="反链"><el-tag
-                        size="small">{{ nodeInfo.backLinkCount }}</el-tag></el-descriptions-item>
-                <el-descriptions-item label-align="right" label="正链"><el-tag
-                        size="small">{{ nodeInfo.frontLinkCount }}</el-tag></el-descriptions-item>
-                <!-- <el-descriptions-item label="">按钮</el-descriptions-item> -->
+                <el-descriptions-item label-align="right" label="id" :span="2"><el-link :href="nodeInfo.url"
+                        target="_blank">{{ nodeInfo.id }}</el-link></el-descriptions-item>
+                <el-descriptions-item label-align="right" label="创建时间" :span="2">{{ nodeInfo.created
+}}</el-descriptions-item>
+                <el-descriptions-item label-align="right" label="更新时间" :span="2">{{ nodeInfo.updated
+}}</el-descriptions-item>
+                <el-descriptions-item label-align="right" label="反链"><el-tag size="small">{{ nodeInfo.backLinkCount
+}}</el-tag></el-descriptions-item>
+                <el-descriptions-item label-align="right" label="正链"><el-tag size="small">{{ nodeInfo.frontLinkCount
+                        }}</el-tag></el-descriptions-item>
             </el-descriptions>
 
         </template>

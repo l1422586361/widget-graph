@@ -55,12 +55,12 @@ const createGraph = () => {
     myGraph.render()
     // this.myGraph = myGraph || null
 
-    myGraph.on('node:click', (evt) => {
+    myGraph.on('node:click', async (evt) => {
         let id = evt.item._cfg.id
         console.log(12314,id)
         activeNode.id = id
         // this.$refs.ToolsBar.toggleRightWindows('Info')
-        toolsBarRef.value.toggleRightWindows('Info')
+        await toolsBarRef.value.toggleRightWindows('Info')
     })
 }
 
@@ -70,6 +70,15 @@ const createGraph = () => {
 function updateGraphData(v) {
     // console.log(v)
     myGraph.changeData(v)
+}
+
+function flushGraphLayout(){
+    // console.log(11)
+    myGraph.layout()
+}
+
+function changeSizeGraph(width,heigth){
+    myGraph.changeSize(width, heigth)
 }
 
 
@@ -82,8 +91,10 @@ function updateGraphData(v) {
         <!-- <button @click="toggleSearch">测试搜索</button>
         <button @click="toggleInfo">测试信息</button> -->
     </div>
-    <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData" v-bind:myGraph="myGraph"
-        :activeNode="activeNode" ref="toolsBarRef"></ToolsBar>
+    <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData"
+        :activeNode="activeNode" ref="toolsBarRef"
+        v-on:flushGraphLayout="flushGraphLayout"
+        v-on:changeSizeGraph="changeSizeGraph"></ToolsBar>
 
 
 </template>
@@ -94,4 +105,5 @@ function updateGraphData(v) {
     width: auto;
     color: aliceblue;
 }
+
 </style>
