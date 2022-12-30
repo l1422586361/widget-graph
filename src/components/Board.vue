@@ -8,7 +8,6 @@ import { useGraphMenu } from '../data/useGraphMenu.js';
 import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import ToolsBar from './ToolsBar.vue';
-import ContextMenu from './ContextMenu.vue'
 
 
 let myGraph
@@ -17,7 +16,7 @@ let pageHeight
 let pageWidth
 const activeNode = reactive({})
 let toolsBarRef = ref(null)
-let showMenu = ref(false)
+
 
 const graphData = ref(
     useInitData()
@@ -50,8 +49,9 @@ const createGraph = () => {
     // let container = document.getElementById('mountNode')
     pageWidth = document.documentElement.clientWidth
     pageHeight = document.documentElement.clientHeight
-    // let contextMenu = new G6.Menu(useGraphMenu())
-    myGraph = new G6.Graph(useGraphOptions('mountNode', pageWidth, pageHeight,))
+    let contextMenu = new G6.Menu(useGraphMenu())
+    // myGraph = new G6.Graph(useGraphOptions('mountNode', pageWidth, pageHeight))
+    myGraph = new G6.Graph(useGraphOptions('mountNode', pageWidth, pageHeight,[contextMenu]))
     // myGraph = new G6.Graph(画布配置)
     myGraph.data(data)
     myGraph.render()
@@ -66,13 +66,18 @@ const createGraph = () => {
         await toolsBarRef.value.toggleRightWindows('Info')
     })
 
-    myGraph.on('node:contextmenu',e=>{
-        console.log("右键触发",e)
-        // e的数据转入与加载子组件（右键菜单），子组件获取节点id进行相应事件触发，事件触发完成后销毁子组件
-        let nodeItem = ref(e)
-        showMenu = !showMenu
-    })
+    // myGraph.on('node:contextmenu',e=>{
+    //     console.log("右键触发",e)
+    //     // e的数据转入与加载子组件（右键菜单），子组件获取节点id进行相应事件触发，事件触发完成后销毁子组件
+    //     showMenu = !showMenu
+    //     activeNode.left = e.clientX
+    //     activeNode.top = e.clientY
+    //     activeNode.id = e.item._cfg.id
+    //     activeNode.desc = e.item._cfg.model.label
+    //     console.log(activeNode,showMenu)
+    // })
 }
+
 
 
 
@@ -94,23 +99,32 @@ function changeSizeGraph(width,heigth){
 function clearGraph(){
     myGraph.clear()
 }
+function test(){
+    console.log(123)
+}
+let showMenu = ref(false)
 
 </script>
 <template>
 
-    <div id="mountNode">
-
-        <!-- <aButton @click="clickE()"></aButton> -->
-        <!-- <button @click="toggleSearch">测试搜索</button>
-        <button @click="toggleInfo">测试信息</button> -->
-    </div>
+    
     <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData"
         :activeNode="activeNode" ref="toolsBarRef"
         v-on:flushGraphLayout="flushGraphLayout"
         v-on:changeSizeGraph="changeSizeGraph"
         v-on:clearGraph="clearGraph"></ToolsBar>
-    <ContextMenu v-if="showMenu"></ContextMenu>
+        
+    <!-- <ContextMenu
+    :activeNode="activeNode"
+    v-if="showMenu"
+    ></ContextMenu> -->
 
+    <div id="mountNode">
+
+<!-- <aButton @click="clickE()"></aButton> -->
+<!-- <button @click="toggleSearch">测试搜索</button>
+<button @click="toggleInfo">测试信息</button> -->
+</div>
 
 </template>
 
@@ -120,5 +134,7 @@ function clearGraph(){
     width: auto;
     color: aliceblue;
 }
+
+
 
 </style>

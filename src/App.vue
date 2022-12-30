@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import BoardVue from "./components/Board.vue";
+import ContextMenu from "./components/ContextMenu.vue";
 import ToolsBarVue from "./components/ToolsBar.vue";
 
 
@@ -10,6 +11,7 @@ import ToolsBarVue from "./components/ToolsBar.vue";
   <!-- <ToolsBarVue></ToolsBarVue> -->
   <BoardVue>
   </BoardVue>
+  <!-- <ContextMenu></ContextMenu> -->
 </template>
 
 <style scoped>

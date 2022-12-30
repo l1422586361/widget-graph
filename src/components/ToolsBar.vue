@@ -5,13 +5,12 @@ import { ref, onMounted, watch, reactive } from 'vue'
 // import { Search } from '@element-plus/icons-vue'
 import { fullTextSearchBlock, getBlockByID } from '../utils/api.js'
 import { getDocCount, getDocSort, } from '../js/base.js'
-import { hasNode, getAllLinks, hasEdge } from '../js/base.js'
+import { getAllLinks, addNode,expand1LayerOfRelationship,addEdge } from '../js/base.js'
 import {
     Search
 } from "@element-plus/icons-vue";
 import { useInitData } from '../data/useInitData.js';
 import { useToolsItem } from '../data/useToolsItem.js';
-import { update } from 'lodash';
 
 
 let showRightWindows = ref('')
@@ -41,17 +40,7 @@ const props = defineProps(
         }
     })
 
-async function addNode(node) {
-    if (!await hasNode(props.graphData, node.id)) {
-        props.graphData.nodes.push(node)
-    }
-}
 
-async function addEdge(edge) {
-    if (!await hasEdge(props.graphData, edge)) {
-        props.graphData.edges.push(edge)
-    }
-}
 
 function updateGraphData() {
     emit('update:graphData', props.graphData)
@@ -87,7 +76,7 @@ async function toggleRightWindows(v) {
     }
     if (v === 'test') {
         let node = { id: '20220606093400-r0y6l0z', label: '111111' }
-        await addNode(node)
+        await addNode(props.graphData,node)
         updateGraphData()
         // test2()
     }
@@ -101,9 +90,9 @@ async function toggleRightWindows(v) {
                 let sourceNode = { id: link.sourceId, label: link.sourceDesc }
                 let targetNode = { id: link.targetId, label: link.targetDesc }
                 let edge = { source: link.targetId, target: link.sourceId }
-                await addNode(sourceNode)
-                await addNode(targetNode)
-                await addEdge(edge)
+                await addNode(props.graphData,sourceNode)
+                await addNode(props.graphData,targetNode)
+                await addEdge(props.graphData,edge)
             }
 
         })
@@ -157,12 +146,12 @@ async function getNodeByStr(str) {
 
 
 async function add1Node(id, desc) {
-    addNode(id, desc)
+    await addNode(props.graphData,{id:id, label:desc})
     updateGraphData()
 }
 
 async function add2Node(id, desc) {
-    await expand1LayerOfRelationship(id, desc)
+    await expand1LayerOfRelationship(props.graphData,id, desc)
     // emit('update:graphData',props.graphData)
     updateGraphData()
 
@@ -173,33 +162,18 @@ async function add2Node(id, desc) {
 
 
 async function add3Node(id, desc) {
-    expand1LayerOfRelationship(id, desc)
+    expand1LayerOfRelationship(props.graphData,id, desc)
     await getAllLinks(id).then(async e => {
         for (let link1 of e) {
-            await expand1LayerOfRelationship(link1.sourceId, link1.sourceDesc)
-            await expand1LayerOfRelationship(link1.targetId, link1.targetDesc)
+            await expand1LayerOfRelationship(props.graphData,link1.sourceId, link1.sourceDesc)
+            await expand1LayerOfRelationship(props.graphData,link1.targetId, link1.targetDesc)
         }
     })
     // emit('update:graphData',props.graphData)
     updateGraphData()
 }
 
-async function expand1LayerOfRelationship(id, desc) {
-    let node = { id: id, label: desc }
-    await addNode(node)
-    await getAllLinks(id).then(async e => {
-        // console.log(e)
-        for (let link of e) {
-            let node1 = { id: link.sourceId, label: link.sourceDesc }
-            let node2 = { id: link.targetId, label: link.targetDesc }
-            let edge = { source: link.sourceId, target: link.targetId }
-            await addNode(node1)
-            await addNode(node2)
-            await addEdge(edge)
-        }
-    })
-    // console.log(props.graphData)
-}
+
 
 async function onOpen() {
     let canvasHeight = document.documentElement.clientHeight;
@@ -347,7 +321,7 @@ async function onClose() {
     margin: 0 auto;
     display: inline-block;
     /* box-shadow: rgb(174, 174, 174) 0px 0px 2px 2px; */
-    z-index: 9999;
+    z-index: 1;
 }
 
 .el-input {
