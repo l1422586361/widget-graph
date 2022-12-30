@@ -5,13 +5,13 @@ import { ref, onMounted, watch, reactive } from 'vue'
 // import { Search } from '@element-plus/icons-vue'
 import { fullTextSearchBlock, getBlockByID } from '../utils/api.js'
 import { getDocCount, getDocSort, } from '../js/base.js'
-import { getAllLinks, addNode,expand1LayerOfRelationship,addEdge } from '../js/base.js'
+import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge } from '../js/base.js'
 import {
+    Mouse,
     Search
 } from "@element-plus/icons-vue";
 import { useInitData } from '../data/useInitData.js';
 import { useToolsItem } from '../data/useToolsItem.js';
-
 
 let showRightWindows = ref('')
 let toolItem = ref(useToolsItem())
@@ -22,6 +22,7 @@ let size = ref('400px')
 let input1 = ref('')
 const nodeLists = ref([]) // 关键字查询结果
 const nodeInfo = reactive({})
+const uploadRef = ref(null)
 
 
 const emit = defineEmits(['update:graphData', 'flushGraphLayout', 'changeSizeGraph', 'clearGraph'])
@@ -76,7 +77,7 @@ async function toggleRightWindows(v) {
     }
     if (v === 'test') {
         let node = { id: '20220606093400-r0y6l0z', label: '111111' }
-        await addNode(props.graphData,node)
+        await addNode(props.graphData, node)
         updateGraphData()
         // test2()
     }
@@ -90,9 +91,9 @@ async function toggleRightWindows(v) {
                 let sourceNode = { id: link.sourceId, label: link.sourceDesc }
                 let targetNode = { id: link.targetId, label: link.targetDesc }
                 let edge = { source: link.targetId, target: link.sourceId }
-                await addNode(props.graphData,sourceNode)
-                await addNode(props.graphData,targetNode)
-                await addEdge(props.graphData,edge)
+                await addNode(props.graphData, sourceNode)
+                await addNode(props.graphData, targetNode)
+                await addEdge(props.graphData, edge)
             }
 
         })
@@ -106,6 +107,44 @@ async function toggleRightWindows(v) {
     }
     if (v === 'Clear') {
         emit('clearGraph')
+    }
+    if (v === 'Import') {
+        // uploadRef.value.dispatchEvent(new MouseEvent('click'))
+        document.querySelector(".el-upload").click()
+        // console.log(uploadRef)
+    }
+    if (v === 'Save') {
+        let graphData = props.graphData
+        let saveData = {}
+        saveData.nodes = graphData.nodes
+        saveData.edges = graphData.edges
+        console.log("saveData", saveData)
+        try {
+            let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
+            let saveDataBlob = new Blob([JSON.stringify(saveData)], { type: 'application/json' })
+            let 数据文件 = new File([saveDataBlob], `graphf${nodeid}.json`, { lastModified: Date.now() })
+            let data = new FormData
+            data.append('assetsDirPath', config.dataSavePath)
+            data.append('file[]', 数据文件)
+            let url = '/api/asset/upload'
+            // let filepath = ""
+            await fetch(url, {
+                body: data,
+                method: 'POST',
+                headers: { 'Authorization': `Token ${config.token}` },
+            }).then(function (response) {
+                console.log(response)
+                return response.json()
+            })
+            alert('保存成功')
+        } catch {
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
+            let downloadAnchorNode = document.createElement('a')
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "result.json")
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
     }
 
 }
@@ -146,12 +185,12 @@ async function getNodeByStr(str) {
 
 
 async function add1Node(id, desc) {
-    await addNode(props.graphData,{id:id, label:desc})
+    await addNode(props.graphData, { id: id, label: desc })
     updateGraphData()
 }
 
 async function add2Node(id, desc) {
-    await expand1LayerOfRelationship(props.graphData,id, desc)
+    await expand1LayerOfRelationship(props.graphData, id, desc)
     // emit('update:graphData',props.graphData)
     updateGraphData()
 
@@ -162,11 +201,11 @@ async function add2Node(id, desc) {
 
 
 async function add3Node(id, desc) {
-    expand1LayerOfRelationship(props.graphData,id, desc)
+    expand1LayerOfRelationship(props.graphData, id, desc)
     await getAllLinks(id).then(async e => {
         for (let link1 of e) {
-            await expand1LayerOfRelationship(props.graphData,link1.sourceId, link1.sourceDesc)
-            await expand1LayerOfRelationship(props.graphData,link1.targetId, link1.targetDesc)
+            await expand1LayerOfRelationship(props.graphData, link1.sourceId, link1.sourceDesc)
+            await expand1LayerOfRelationship(props.graphData, link1.targetId, link1.targetDesc)
         }
     })
     // emit('update:graphData',props.graphData)
@@ -193,6 +232,21 @@ async function onClose() {
 }
 
 
+function handleBeforeUpload(file){
+    let reader = new FileReader()
+    // console.log(111, file)
+    reader.readAsText(file.raw, "UTF-8")
+    reader.onload = function (e) {
+        let res = JSON.parse(e.target.result)
+        // graph.changeData(res)
+        // let res = new Uint8Array(e.target.result)
+        // let snippets = new TextDecoder('gb2312').decode(res);
+        // console.log(res)
+        emit('update:graphData',res)
+    }
+}
+
+
 </script>
 
 <template>
@@ -204,6 +258,13 @@ async function onClose() {
                 <el-button v-if="tool.enable" :icon="tool.icon" @click="toggleRightWindows(tool.name)" />
             </el-tooltip>
         </el-button-group>
+        <!-- <input ref="fileBtn" type="file" id="file" :on-change="importData" style="display: none" /> -->
+        <el-upload style="display: none" ref="uploadRef" class="upload-demo"
+            action="" :auto-upload="false" :on-change="handleBeforeUpload">
+            <template #trigger>
+                <el-button type="primary">select file</el-button>
+            </template>
+            </el-upload>
     </template>
 
 
