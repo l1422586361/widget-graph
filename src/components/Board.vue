@@ -91,6 +91,9 @@ function changeSizeGraph(width,heigth){
     myGraph.changeSize(width, heigth)
 }
 
+function clearGraph(){
+    myGraph.clear()
+}
 
 </script>
 <template>
@@ -104,7 +107,8 @@ function changeSizeGraph(width,heigth){
     <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData"
         :activeNode="activeNode" ref="toolsBarRef"
         v-on:flushGraphLayout="flushGraphLayout"
-        v-on:changeSizeGraph="changeSizeGraph"></ToolsBar>
+        v-on:changeSizeGraph="changeSizeGraph"
+        v-on:clearGraph="clearGraph"></ToolsBar>
     <ContextMenu v-if="showMenu"></ContextMenu>
 
 

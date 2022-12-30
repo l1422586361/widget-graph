@@ -11,6 +11,7 @@ import {
 } from "@element-plus/icons-vue";
 import { useInitData } from '../data/useInitData.js';
 import { useToolsItem } from '../data/useToolsItem.js';
+import { update } from 'lodash';
 
 
 let showRightWindows = ref('')
@@ -24,7 +25,7 @@ const nodeLists = ref([]) // 关键字查询结果
 const nodeInfo = reactive({})
 
 
-const emit = defineEmits(['update:graphData', 'flushGraphLayout', 'changeSizeGraph'])
+const emit = defineEmits(['update:graphData', 'flushGraphLayout', 'changeSizeGraph', 'clearGraph'])
 defineExpose({
     toggleRightWindows,
 })
@@ -114,6 +115,9 @@ async function toggleRightWindows(v) {
         // props.myGraph.layout()
         emit('flushGraphLayout')
     }
+    if (v === 'Clear') {
+        emit('clearGraph')
+    }
 
 }
 
@@ -152,21 +156,49 @@ async function getNodeByStr(str) {
 }
 
 
-
 async function add1Node(id, desc) {
-    // 增加普通节点
-    let nodeInfo = { id: id, label: desc }
-    var value = await hasNode(props.graphData, id)
-    console.log(value)
-    if (value === false) {
-        // console.log("添加节点",Date(),nodeInfo)
-        // props.myGraph.addItem('node', nodeInfo)
-        // props.myGraph.changeData(myGraph.save())
-        // console.log(myGraph.save())
-        props.graphData.nodes.push(nodeInfo)
-        console.log(props.graphData)
-        emit('update:graphData', props.graphData)
-    }
+    addNode(id, desc)
+    updateGraphData()
+}
+
+async function add2Node(id, desc) {
+    await expand1LayerOfRelationship(id, desc)
+    // emit('update:graphData',props.graphData)
+    updateGraphData()
+
+}
+
+
+
+
+
+async function add3Node(id, desc) {
+    expand1LayerOfRelationship(id, desc)
+    await getAllLinks(id).then(async e => {
+        for (let link1 of e) {
+            await expand1LayerOfRelationship(link1.sourceId, link1.sourceDesc)
+            await expand1LayerOfRelationship(link1.targetId, link1.targetDesc)
+        }
+    })
+    // emit('update:graphData',props.graphData)
+    updateGraphData()
+}
+
+async function expand1LayerOfRelationship(id, desc) {
+    let node = { id: id, label: desc }
+    await addNode(node)
+    await getAllLinks(id).then(async e => {
+        // console.log(e)
+        for (let link of e) {
+            let node1 = { id: link.sourceId, label: link.sourceDesc }
+            let node2 = { id: link.targetId, label: link.targetDesc }
+            let edge = { source: link.sourceId, target: link.targetId }
+            await addNode(node1)
+            await addNode(node2)
+            await addEdge(edge)
+        }
+    })
+    // console.log(props.graphData)
 }
 
 async function onOpen() {
