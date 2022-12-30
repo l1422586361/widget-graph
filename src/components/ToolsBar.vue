@@ -57,6 +57,7 @@ async function toggleRightWindows(v) {
     showRightWindows.value = v
     if ('Search' === v) {
         drawer.value = true
+        // console.log(1,drawer.value,drawer2.value,showRightWindows.value)
     }
     if ('Info' === v) {
         drawer2.value = true
@@ -226,7 +227,9 @@ async function onClose() {
     let canvasWidth = document.documentElement.clientHeight;
     console.log(canvasHeight, canvasWidth)
     drawer2.value = false
+    drawer.value = false
     showRightWindows.value = ''
+    // console.log(2,drawer.value,drawer2.value,showRightWindows.value)
     // await props.myGraph.changeSize(canvasWidth,canvasHeight)
     // emit('changeSizeGraph',canvasWidth,canvasHeight)
 }
@@ -273,7 +276,7 @@ function handleBeforeUpload(file){
 
 
 
-    <el-drawer v-model="drawer" :size=size :modal="modal">
+    <el-drawer v-model="drawer" size="400px" :modal="false" @open="onOpen" @close="onClose" :lock-scroll="false">
         <template #header>
             <!-- <div>
                 <h4>全局搜索</h4>
@@ -323,7 +326,7 @@ function handleBeforeUpload(file){
 
 
 
-    <el-drawer v-model="drawer2" :size=size :modal="modal" @open="onOpen" @close="onClose">
+    <el-drawer v-model="drawer2" size="400px" :modal="false" @open="onOpen" @close="onClose" :lock-scroll="false">
         <template #default>
             <el-descriptions :title="nodeInfo.name" :column="2" size="default">
                 <el-descriptions-item label-align="right" label="id" :span="2"><el-link :href="nodeInfo.url"
