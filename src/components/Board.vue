@@ -8,6 +8,7 @@ import { useGraphMenu } from '../data/useGraphMenu.js';
 import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import ToolsBar from './ToolsBar.vue';
+import ContextMenu from './ContextMenu.vue'
 
 
 let myGraph
@@ -16,6 +17,7 @@ let pageHeight
 let pageWidth
 const activeNode = reactive({})
 let toolsBarRef = ref(null)
+let showMenu = ref(false)
 
 const graphData = ref(
     useInitData()
@@ -48,19 +50,27 @@ const createGraph = () => {
     // let container = document.getElementById('mountNode')
     pageWidth = document.documentElement.clientWidth
     pageHeight = document.documentElement.clientHeight
-    let contextMenu = new G6.Menu(useGraphMenu())
-    myGraph = new G6.Graph(useGraphOptions('mountNode', pageWidth, pageHeight, [contextMenu]))
+    // let contextMenu = new G6.Menu(useGraphMenu())
+    myGraph = new G6.Graph(useGraphOptions('mountNode', pageWidth, pageHeight,))
     // myGraph = new G6.Graph(画布配置)
     myGraph.data(data)
     myGraph.render()
     // this.myGraph = myGraph || null
 
     myGraph.on('node:click', async (evt) => {
+        // 节点左键事件
         let id = evt.item._cfg.id
         console.log(12314,id)
         activeNode.id = id
         // this.$refs.ToolsBar.toggleRightWindows('Info')
         await toolsBarRef.value.toggleRightWindows('Info')
+    })
+
+    myGraph.on('node:contextmenu',e=>{
+        console.log("右键触发",e)
+        // e的数据转入与加载子组件（右键菜单），子组件获取节点id进行相应事件触发，事件触发完成后销毁子组件
+        let nodeItem = ref(e)
+        showMenu = !showMenu
     })
 }
 
@@ -95,6 +105,7 @@ function changeSizeGraph(width,heigth){
         :activeNode="activeNode" ref="toolsBarRef"
         v-on:flushGraphLayout="flushGraphLayout"
         v-on:changeSizeGraph="changeSizeGraph"></ToolsBar>
+    <ContextMenu v-if="showMenu"></ContextMenu>
 
 
 </template>

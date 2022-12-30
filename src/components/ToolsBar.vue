@@ -24,7 +24,7 @@ const nodeLists = ref([]) // 关键字查询结果
 const nodeInfo = reactive({})
 
 
-const emit = defineEmits(['update:graphData','flushGraphLayout','changeSizeGraph'])
+const emit = defineEmits(['update:graphData', 'flushGraphLayout', 'changeSizeGraph'])
 defineExpose({
     toggleRightWindows,
 })
@@ -169,17 +169,17 @@ async function add1Node(id, desc) {
     }
 }
 
-async function onOpen(){
+async function onOpen() {
     let canvasHeight = document.documentElement.clientHeight;
     let canvasWidth = document.documentElement.clientHeight - 400;
-    console.log(canvasHeight,canvasWidth)
+    console.log(canvasHeight, canvasWidth)
     // await props.myGraph.changeSize(canvasWidth,canvasHeight)
     // emit('changeSizeGraph',canvasWidth,canvasHeight)
 }
-async function onClose(){
+async function onClose() {
     let canvasHeight = document.documentElement.clientHeight;
     let canvasWidth = document.documentElement.clientHeight;
-    console.log(canvasHeight,canvasWidth)
+    console.log(canvasHeight, canvasWidth)
     drawer2.value = false
     showRightWindows.value = ''
     // await props.myGraph.changeSize(canvasWidth,canvasHeight)
