@@ -5,7 +5,7 @@ import { ref, onMounted, watch, reactive } from 'vue'
 // import { Search } from '@element-plus/icons-vue'
 import { fullTextSearchBlock, getBlockByID } from '../utils/api.js'
 import { getDocCount, getDocSort, } from '../js/base.js'
-import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge } from '../js/base.js'
+import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge,nodeLight } from '../js/base.js'
 import {
     Mouse,
     Search
@@ -17,8 +17,8 @@ let showRightWindows = ref('')
 let toolItem = ref(useToolsItem())
 let drawer = ref(false)
 let drawer2 = ref(false)
-let modal = ref(false) // 窗口遮罩
-let size = ref('400px')
+// let modal = ref(false) // 窗口遮罩
+// let size = ref('400px')
 let input1 = ref('')
 const nodeLists = ref([]) // 关键字查询结果
 const nodeInfo = reactive({})
@@ -82,10 +82,14 @@ async function toggleRightWindows(v) {
         updateGraphData()
         // test2()
     }
-
+    if(v === 'NodeLight'){
+        props.graphData = await nodeLight(props.graphData)
+        updateGraphData()
+        console.log(props.graphData)
+    }
     if (v === 'getAll') {
         // console.log(111)
-        // console.log(props.graphData)
+        console.log(props.graphData)
         await getAllLinks().then(async e => {
             // console.log(e)
             for (let link of e) {

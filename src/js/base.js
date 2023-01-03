@@ -130,6 +130,45 @@ where def_block_id in (select id from blocks where type in ('${type}'))
     })
 }
 
+export async function nodeLight(graphData){
+    // 高亮节点
+    let nodesNew = []
+    let nodesIds = graphData.nodes.map(e => { return e.id })
+    let ids = nodesIds.join('\',\'')
+    let type = blockType.join('\',\'')
+    let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
+    left join ( select def_block_id as id,count(distinct root_id) as backcount from refs
+ where root_id in (select id from blocks where type in ('${type}'))
+  GROUP BY def_block_id) t2 on t1.id = t2.id
+    left join (select root_id as id,count(distinct def_block_id) as frontcount from refs 
+where def_block_id in (select id from blocks where type in ('${type}'))
+ GROUP BY root_id) t3 on t1.id = t3.id
+    where t1.type = 'd' and t1.id in ('${ids}');`
+    await sql(sqldata).then(e => {
+        e.forEach(n=>{
+            let node = {id:n.id,label:n.fcontent,backcount:n.backcount,frontcount:n.frontcount}
+            // 定义节点大小
+            if(node.backcount + node.frontcount <=1){
+                node.isLeaf = true;
+                node.size = 10;
+            }else if(node.backcount  + node.frontcount<=5){
+                node.size=20;
+            }else if(node.backcount + node.frontcount<=20){
+                node.size=40
+                node.style=config.superNodeStyle.style
+            }else if(node.backcount + node.frontcount>20){
+                node.size=80
+                node.style=config.superNodeStyle.style
+            }
+            nodesNew.push(node)
+        })
+        graphData.nodes = nodesNew
+        return graphData
+    }).catch(err => {
+        console.log("nodeLight", err)
+    })
+}
+
 
 
 export async function delNodeEdge(obj, nodeid) {
