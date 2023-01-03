@@ -12,6 +12,7 @@ import {
 } from "@element-plus/icons-vue";
 import { useInitData } from '../data/useInitData.js';
 import { useToolsItem } from '../data/useToolsItem.js';
+import {config} from '../js/config.js'
 
 let showRightWindows = ref('')
 let toolItem = ref(useToolsItem())
@@ -190,7 +191,7 @@ async function getNodeByStr(str) {
 
 
 async function add1Node(id, desc) {
-    await addNode(props.graphData, { id: id, label: desc })
+    await addNode(props.graphData, { id: id, label: desc ,style:config.extNodeStyle.style})
     updateGraphData()
 }
 
