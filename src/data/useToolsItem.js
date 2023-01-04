@@ -32,6 +32,13 @@ export function useToolsItem() {
 
     },
     {
+      name: "test2",
+      title: "测试",
+      enable: true,
+      icon: markRaw(Share),
+
+    },
+    {
       name: "getAll",
       title: "全局关系图",
       enable: true,

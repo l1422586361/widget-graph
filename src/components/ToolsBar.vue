@@ -5,14 +5,14 @@ import { ref, onMounted, watch, reactive } from 'vue'
 // import { Search } from '@element-plus/icons-vue'
 import { fullTextSearchBlock, getBlockByID } from '../utils/api.js'
 import { getDocCount, getDocSort, } from '../js/base.js'
-import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge,nodeLight } from '../js/base.js'
+import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
 import {
     Mouse,
     Search
 } from "@element-plus/icons-vue";
 import { useInitData } from '../data/useInitData.js';
 import { useToolsItem } from '../data/useToolsItem.js';
-import {config} from '../js/config.js'
+import { config } from '../js/config.js'
 
 let showRightWindows = ref('')
 let toolItem = ref(useToolsItem())
@@ -78,12 +78,57 @@ async function toggleRightWindows(v) {
         }
     }
     if (v === 'test') {
-        let node = { id: '20220606093400-r0y6l0z', label: '111111' }
-        await addNode(props.graphData, node)
-        updateGraphData()
+        // let node = { id: '20220606093400-r0y6l0z', label: '111111' }
+        let node = { id: '20220402091807-01pjx5g', label: '111111' }
+        // await addNode(props.graphData, node)
+        // updateGraphData()
         // test2()
+        getBlockByID(node.id).then(e => {
+            console.log(1231, e)
+        })
     }
-    if(v === 'NodeLight'){
+    if (v === 'test2') {
+        // let node = { id: '20220606093400-r0y6l0z', label: '111111' }
+        let node = { id: '20220402091807-01pjx5g', label: '111111' }
+        try {
+            // let nodeid = node.id
+            let data=reactive(useInitData())
+            let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
+            await fetch(`${config.dataSavePath}/graph-${nodeid}.json`).then(async res => {
+                if (res.status == 404) {
+                    await getBlockByID(nodeid).then(async e => {
+                        // addNode(graph,e.root_id,'')
+
+                        // await expand1LayerOfRelationship(e.root_id, graph)
+                        // await updateNodeToMain(graph, e.root_id)
+                        // expand1LayerOfRelationship()
+                        await getBlockByID(e.root_id).then(async e => {
+                            console.log(nodeid, e.root_id)
+                            await expand1LayerOfRelationship(props.graphData, e.root_id, e.fcontent)
+                            // await myGraph.changeData(data)
+                            updateGraphData()
+                        })
+
+                    })
+                } else {
+                    return res
+                }
+            }).then(async res => {
+                // console.log(await res.json(),2222)
+                props.graphData = res
+                updateGraphData()
+            }).catch(err => {
+                console.log('window.onload ', err)
+            })
+            // getBlockByID(nodeid).then(e => {
+            //     expand1LayerOfRelationship(e.root_id, graph)
+            // })
+        } catch (err) {
+            console.warn(err);
+            console.log("当前不在思源文档内部")
+        }
+    }
+    if (v === 'NodeLight') {
         props.graphData = await nodeLight(props.graphData)
         updateGraphData()
         console.log(props.graphData)
@@ -191,7 +236,7 @@ async function getNodeByStr(str) {
 
 
 async function add1Node(id, desc) {
-    await addNode(props.graphData, { id: id, label: desc ,style:config.extNodeStyle.style})
+    await addNode(props.graphData, { id: id, label: desc, style: config.extNodeStyle.style })
     updateGraphData()
 }
 
@@ -240,7 +285,7 @@ async function onClose() {
 }
 
 
-function handleBeforeUpload(file){
+function handleBeforeUpload(file) {
     let reader = new FileReader()
     // console.log(111, file)
     reader.readAsText(file.raw, "UTF-8")
@@ -250,7 +295,7 @@ function handleBeforeUpload(file){
         // let res = new Uint8Array(e.target.result)
         // let snippets = new TextDecoder('gb2312').decode(res);
         // console.log(res)
-        emit('update:graphData',res)
+        emit('update:graphData', res)
     }
 }
 
@@ -267,12 +312,12 @@ function handleBeforeUpload(file){
             </el-tooltip>
         </el-button-group>
         <!-- <input ref="fileBtn" type="file" id="file" :on-change="importData" style="display: none" /> -->
-        <el-upload style="display: none" ref="uploadRef" class="upload-demo"
-            action="" :auto-upload="false" :on-change="handleBeforeUpload">
+        <el-upload style="display: none" ref="uploadRef" class="upload-demo" action="" :auto-upload="false"
+            :on-change="handleBeforeUpload">
             <template #trigger>
                 <el-button type="primary">select file</el-button>
             </template>
-            </el-upload>
+        </el-upload>
     </template>
 
 
