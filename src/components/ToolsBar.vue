@@ -191,8 +191,8 @@ async function toggleRightWindows(v) {
         } catch {
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
             let downloadAnchorNode = document.createElement('a')
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "result.json")
+            await downloadAnchorNode.setAttribute("href", dataStr);
+            await downloadAnchorNode.setAttribute("download", "result.json")
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
         }

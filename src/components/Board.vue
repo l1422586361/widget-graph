@@ -131,7 +131,7 @@ function clearGraph(){
 
 </script>
 <template>
-    <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData" :activeNode="activeNode"
+    <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData" v-on:clearGraph="clearGraph" :activeNode="activeNode"
         ref="toolsBarRef" v-on:flushGraphLayout="flushGraphLayout" v-on:changeSizeGraph="changeSizeGraph"></ToolsBar>
         <div id="mountNode">
         </div>
