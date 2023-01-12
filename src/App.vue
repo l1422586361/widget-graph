@@ -10,10 +10,9 @@ import WhiteBox from "../test/whiteBox/index.vue"
 
 <template>
   <!-- <ToolsBarVue></ToolsBarVue> -->
-  <!-- <BoardVue>
-  </BoardVue> -->
+  <BoardVue></BoardVue>
   <!-- <RightWindow1Search></RightWindow1Search> -->
-  <WhiteBox></WhiteBox>
+  <!-- <WhiteBox></WhiteBox> -->
 </template>
 
 <style scoped>
