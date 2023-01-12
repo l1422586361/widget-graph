@@ -59,6 +59,8 @@
 
 - docker run -d -v /files/git/siyuan_dev:/siyuan/workspace -v /files/git/widget-graph:/siyuan/workspace/data/widgets/widget-graph  --name siyuan_dev -p 6807:6806 -u root:root b3log/siyuan:latest --workspace=/siyuan/workspace/
 - http://127.0.0.1:6806/widgets/widget-graph/
+- nvm use v16.18.1
+- npm run dev
 
 
 # 更新历史
