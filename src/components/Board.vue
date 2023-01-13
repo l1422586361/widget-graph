@@ -9,6 +9,7 @@ import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import { getBlockByID } from '../utils/api.js';
 import ToolsBar from './ToolsBar.vue';
+// import {} from 'naive-ui'
 
 
 let myGraph
@@ -133,8 +134,7 @@ function clearGraph(){
 <template>
     <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData" v-on:clearGraph="clearGraph" :activeNode="activeNode"
         ref="toolsBarRef" v-on:flushGraphLayout="flushGraphLayout" v-on:changeSizeGraph="changeSizeGraph"></ToolsBar>
-        <div id="mountNode">
-        </div>
+    <div id="mountNode"></div>
 
 </template>
 
