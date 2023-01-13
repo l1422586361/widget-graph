@@ -95,7 +95,7 @@ async function getNodeInfo(id) {
             nodeInfo.url = 'siyuan://blocks/' + id
 
             // console.log(e[2],e[3])
-            console.log(backNoteList,refNoteList)
+            // console.log(backNoteList,refNoteList)
             // 反链汇总
             if(e[2].linkRefsCount != 0){
                 backNoteList.value = e[2].backlinks
@@ -105,7 +105,7 @@ async function getNodeInfo(id) {
                 refNoteList.value = await e[3].map(e=>{return {id:e.targetId,name:e.targetName}})
             }
         })
-        console.log(backNoteList,refNoteList)
+        // console.log(backNoteList,refNoteList)
     }
 }
 
