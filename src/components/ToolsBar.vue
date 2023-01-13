@@ -13,7 +13,11 @@ import {
 import { useInitData } from '../data/useInitData.js';
 import { useToolsItem } from '../data/useToolsItem.js';
 import { config } from '../js/config.js'
-import searchCard from './searchCard.vue'
+import SearchCard from './SearchCard.vue'
+import DetailCard from "./DetailCard.vue";
+
+
+
 let showRightWindows = ref('')
 let toolItem = ref(useToolsItem())
 // let drawer = ref(false)
@@ -21,13 +25,14 @@ let drawer2 = ref(false)
 // let modal = ref(false) // 窗口遮罩
 // let size = ref('400px')
 
-const nodeInfo = reactive({})
+
 const uploadRef = ref(null)
 
 
 const emit = defineEmits(['update:graphData', 'flushGraphLayout', 'changeSizeGraph', 'clearGraph'])
 defineExpose({
     toggleRightWindows,
+    showRightWindows
 })
 const props = defineProps(
     {
@@ -49,8 +54,6 @@ function updateGraphData() {
 
 async function toggleRightWindows(v) {
     if (v === showRightWindows.value) {
-        // drawer.value = false
-        drawer2.value = false
         showRightWindows.value = ''
         return
     }
@@ -58,28 +61,15 @@ async function toggleRightWindows(v) {
     if ('Search' === v) {
         // drawer.value = true
         // console.log(1,drawer.value,drawer2.value,showRightWindows.value)
+        return
     }
     if ('Info' === v) {
-        drawer2.value = true
-        let id = props.activeNode.id
-        console.log(props.activeNode)
-        if (id) {
-            Promise.all([getBlockByID(id), getDocCount(id)]).then(e => {
-                nodeInfo.id = id
-                nodeInfo.name = e[0].fcontent
-                nodeInfo.created = e[0].created
-                nodeInfo.updated = e[0].updated
-                nodeInfo.frontLinkCount = e[1][0].frontcount
-                nodeInfo.backLinkCount = e[1][0].backcount
-                nodeInfo.url = 'siyuan://blocks/' + id
-            })
-            console.log(nodeInfo)
-        }
+        return
     }
     if (v === 'test') {
         // let node = { id: '20220606093400-r0y6l0z', label: '111111' }
         let node = { id: '20220402091807-01pjx5g', label: '111111' }
-        // await addNode(props.graphData, node)
+        await addNode(props.graphData, node)
         // updateGraphData()
         // test2()
         getBlockByID(node.id).then(e => {
@@ -268,29 +258,13 @@ function handleBeforeUpload(file) {
 
 
 
+    <detail-card
+    :activeNode="activeNode"
+    v-if="showRightWindows==='Info'"
+    v-on:toggleRightWindows="toggleRightWindows"
+    ></detail-card>
 
 
-
-
-    <el-drawer v-model="drawer2" size="400px" :modal="false" @open="onOpen" @close="onClose" :lock-scroll="false">
-        <template #default>
-            <el-descriptions :title="nodeInfo.name" :column="2" size="default">
-                <el-descriptions-item label-align="right" label="id" :span="2"><el-link :href="nodeInfo.url"
-                        target="_blank">{{ nodeInfo.id }}</el-link></el-descriptions-item>
-                <el-descriptions-item label-align="right" label="创建时间" :span="2">{{ nodeInfo.created
-}}</el-descriptions-item>
-                <el-descriptions-item label-align="right" label="更新时间" :span="2">{{ nodeInfo.updated
-}}</el-descriptions-item>
-                <el-descriptions-item label-align="right" label="反链"><el-tag size="small">{{ nodeInfo.backLinkCount
-}}</el-tag></el-descriptions-item>
-                <el-descriptions-item label-align="right" label="正链"><el-tag size="small">{{ nodeInfo.frontLinkCount
-                        }}</el-tag></el-descriptions-item>
-            </el-descriptions>
-
-        </template>
-        <template #footer>
-        </template>
-    </el-drawer>
 
 </template>
 

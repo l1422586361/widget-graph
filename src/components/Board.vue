@@ -106,9 +106,16 @@ const createGraph = () => {
     myGraph.on('node:click', async (evt) => {
         // 节点左键事件
         let id = evt.item._cfg.id
-        console.log(12314, id)
+        // console.log(12314, id)
         activeNode.id = id
-        await toolsBarRef.value.toggleRightWindows('Info')
+        // console.log(toolsBarRef.value.showRightWindows)
+        if(toolsBarRef.value.showRightWindows != 'Info'){
+            await toolsBarRef.value.toggleRightWindows('Info')
+        }else{
+            await toolsBarRef.value.toggleRightWindows('')
+            await toolsBarRef.value.toggleRightWindows('Info')
+        }
+        
     })
 }
 
@@ -136,7 +143,7 @@ function clearGraph(){
 
 </script>
 <template>
-    <ToolsBar 
+    <tools-bar 
     v-bind:graphData="graphData" 
     v-on:update:graphData="updateGraphData" 
     v-on:clearGraph="clearGraph" 
