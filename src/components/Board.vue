@@ -9,7 +9,6 @@ import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import { getBlockByID } from '../utils/api.js';
 import ToolsBar from './ToolsBar.vue';
-import { useGraphDataStore } from '../store/graphdata'
 import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
 import { config } from '../js/config.js'
 
