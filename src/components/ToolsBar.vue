@@ -13,15 +13,14 @@ import {
 import { useInitData } from '../data/useInitData.js';
 import { useToolsItem } from '../data/useToolsItem.js';
 import { config } from '../js/config.js'
-
+import searchCard from './searchCard.vue'
 let showRightWindows = ref('')
 let toolItem = ref(useToolsItem())
-let drawer = ref(false)
+// let drawer = ref(false)
 let drawer2 = ref(false)
 // let modal = ref(false) // 窗口遮罩
 // let size = ref('400px')
-let input1 = ref('')
-const nodeLists = ref([]) // 关键字查询结果
+
 const nodeInfo = reactive({})
 const uploadRef = ref(null)
 
@@ -50,14 +49,14 @@ function updateGraphData() {
 
 async function toggleRightWindows(v) {
     if (v === showRightWindows.value) {
-        drawer.value = false
+        // drawer.value = false
         drawer2.value = false
         showRightWindows.value = ''
         return
     }
     showRightWindows.value = v
     if ('Search' === v) {
-        drawer.value = true
+        // drawer.value = true
         // console.log(1,drawer.value,drawer2.value,showRightWindows.value)
     }
     if ('Info' === v) {
@@ -200,70 +199,6 @@ async function toggleRightWindows(v) {
 
 }
 
-async function getNodeByStr(str) {
-    // 查询关键字获取文档
-    await fullTextSearchBlock(str).then(async e => {
-        let matchs = []   // 添加匹配块计数
-        let nodeIds = []
-        for (let doc of e.blocks) {
-            matchs.push({ id: doc.id, length: doc.children.length })
-            nodeIds.push(doc.id)
-        }
-        let nodes = await getDocSort(nodeIds)
-        for (let n of nodes) {
-            for (let count of matchs) { // 添加匹配块计数
-                if (count.id === n.id) {
-                    n.length = count.length
-                }
-            }
-        }
-        // console.log(nodes)
-        // console.log(nodeLists.value)
-        nodes.sort((a, b) => { // 依次对3个计数倒序排序
-            if (a.backcount > b.backcount) return -1;
-            if (a.backcount < b.backcount) return 1;
-            if (a.frontcount > b.frontcount) return -1;
-            if (a.frontcount < b.frontcount) return 1;
-            if (a.length > b.length) return -1;
-            if (a.length < b.length) return 1;
-            return 0
-        })
-        nodeLists.value = nodes
-
-        // console.log(nodeLists)
-    })
-}
-
-
-async function add1Node(id, desc) {
-    await addNode(props.graphData, { id: id, label: desc, style: config.extNodeStyle.style })
-    updateGraphData()
-}
-
-async function add2Node(id, desc) {
-    await expand1LayerOfRelationship(props.graphData, id, desc)
-    // emit('update:graphData',props.graphData)
-    updateGraphData()
-
-}
-
-
-
-
-
-async function add3Node(id, desc) {
-    expand1LayerOfRelationship(props.graphData, id, desc)
-    await getAllLinks(id).then(async e => {
-        for (let link1 of e) {
-            await expand1LayerOfRelationship(props.graphData, link1.sourceId, link1.sourceDesc)
-            await expand1LayerOfRelationship(props.graphData, link1.targetId, link1.targetDesc)
-        }
-    })
-    // emit('update:graphData',props.graphData)
-    updateGraphData()
-}
-
-
 
 async function onOpen() {
     let canvasHeight = document.documentElement.clientHeight;
@@ -306,7 +241,7 @@ function handleBeforeUpload(file) {
     <template class="btn-group">
         <!-- <button @click="test()">1111</button>
         <button @click="test2()">11121</button> -->
-        <el-button-group class="ml-4" size="default" v-for="tool in toolItem">
+        <el-button-group class="ml-4" size="default" v-for="tool in toolItem" :key="tool.name">
             <el-tooltip class="box-item" effect="dark" :content="tool.title" placement="top">
                 <el-button v-if="tool.enable" :icon="tool.icon" @click="toggleRightWindows(tool.name)" />
             </el-tooltip>
@@ -324,51 +259,12 @@ function handleBeforeUpload(file) {
 
 
 
-
-
-    <el-drawer v-model="drawer" size="400px" :modal="false" @open="onOpen" @close="onClose" :lock-scroll="false">
-        <template #header>
-            <!-- <div>
-                <h4>全局搜索</h4>
-            </div> -->
-            <el-input v-model="input1" class="w-50 m-2" placeholder="请输入关键字，回车即触发查询" :prefix-icon="Search" clearable
-                @keyup.enter="getNodeByStr(input1)" />
-
-        </template>
-
-
-        <el-card class="box-card" v-if="nodeLists.length > 1">
-            <template #header>
-                <div class="card-header">
-                    <b>查询结果</b>
-                    <!-- <el-button class="button" text>Operation button</el-button> -->
-                </div>
-            </template>
-            <div v-for="info in nodeLists" :key="info.id" class="text item">
-                <el-tooltip class="box-item" effect="dark" :content="info.fcontent" placement="left-start">
-                    <el-descriptions class="result-list" :title="info.fcontent.slice(0, 10)" :column="3" size="default">
-                        <template #extra>
-                            <el-button-group class="ml-4" size="default">
-                                <el-button size="small" @click="add1Node(info.id, info.fcontent)">+1</el-button>
-                                <el-button size="small" @click="add2Node(info.id, info.fcontent)">+2</el-button>
-                                <el-button size="small" @click="add3Node(info.id, info.fcontent)">+3</el-button>
-                            </el-button-group>
-                        </template>
-                        <el-descriptions-item label="反链"><el-tag size="small">{{ info.backcount
-}}</el-tag></el-descriptions-item>
-                        <el-descriptions-item label="正链"><el-tag size="small">{{ info.frontcount
-}}</el-tag></el-descriptions-item>
-                        <el-descriptions-item label="命中子块"><el-tag size="small">{{ info.length
-}}</el-tag></el-descriptions-item>
-                        <!-- <el-descriptions-item label="">按钮</el-descriptions-item> -->
-                    </el-descriptions>
-                </el-tooltip>
-            </div>
-
-        </el-card>
-
-    </el-drawer>
-
+    <search-card
+    :graph-data="graphData"
+    v-on:update:graphData="updateGraphData"
+    v-if="showRightWindows==='Search'"
+    v-on:toggleRightWindows="toggleRightWindows"
+    ></search-card>
 
 
 
