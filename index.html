@@ -1,120 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Graph</title>
-    <link rel="stylesheet" href="./lib/bootstrap-3.4.1-dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./src/css/main.css" />
-    <script src="./lib/g6.min.js"></script>
-    <!-- <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script> -->
-
-    <!-- font-awesome -->
-    <link rel="stylesheet" href="./lib/font-awesome.min.css">
-</head>
-
-<body>
-    <div class="container-fluid">
-        <div id="mountNode">
-            <div class="btn-group g6-toolbar-ul" role="group" aria-label="...">
-                <button id="searchNote" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top"
-                    title="搜索">
-                    <!-- 搜索 -->
-                    <i class="glyphicon glyphicon-search" aria-hidden="true"></i>
-                </button>
-                <button type="button" class="btn btn-default" onclick="getAllLinksToGraph()" title="全局关系图">
-
-                    <i class="fa fa-spinner" aria-hidden="true"></i>
-                </button>
-                <button type="file" class="btn btn-default" onclick="select_file()" title="导入数据">
-
-                    <i class="glyphicon glyphicon-upload" aria-hidden="true"></i>
-                </button>
-                <button type="button" class="btn btn-default" onclick="saveData()" title="保存数据">
-
-                    <i class="glyphicon glyphicon-floppy-save" aria-hidden="true"></i>
-                </button>
-                
-                <button type="button" class="btn btn-default" onclick="refreshGraph()" title="刷新画布布局">
-
-                    <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i>
-                </button>
-                <button type="button" class="btn btn-default" onclick="getSuperNode()" title="超级节点高亮">
-
-                    <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
-                </button>
-                <button type="button" class="btn btn-default" onclick="clearGraph()" title="清除画布">
-                    <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
-                </button>
-                <input class="button" type="file" id="file" onchange="importData(this.files)" style="display: none" />
-            </div>
-
-
-            <!-- 侧边导航 -->
-            <div id="rightNav" style="background-color:white;">
-                <ul id="rightNav-left" class="nav nav-pills nav-stacked">
-                    <li id="tab0" role="presentation" class="selected"><a><i class="glyphicon glyphicon-remove"
-                                aria-hidden="true"></i></a></li>
-                    <li id="tab1" role="presentation" class="active selected"><a href="#rightNav-tab1"><i
-                                class="glyphicon glyphicon-search" aria-hidden="true"></i></a></li>
-                    <li id="tab2" role="presentation"><a href="#rightNav-tab2"><i class="glyphicon glyphicon-info-sign"
-                                aria-hidden="true"></i></a></li>
-                    <!-- <li role="presentation"><a href="#rightNav-tab3">M</a></li> -->
-                </ul>
-                <div id="rightNav-tab1" style="width: 100%;height: 100%">
-                    <div class="panel">
-                        <form class="form-inline">
-                            <div class="form-group" style="display:flex;width: 100%;">
-                                <!-- <input type="text" class="form-control" id="exampleInputName2" placeholder="笔记本id"> -->
-                                <input type="text" class="form-control" id="text" placeholder="关键字"
-                                    onkeydown="if(event.keyCode==13){return false}"
-                                    style="width: 80%;margin-right: 5px;">
-                                <button id="btnGetNode" type="button" class="btn btn-default"
-                                    onclick="getNote()">查询</button>
-                            </div>
-                            
-                        </form>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><i class="glyphicon glyphicon-info-sign"
-                                    aria-hidden="true"></i>&nbsp&nbsp信息展示</h3>
-                        </div>
-                        <!-- 信息展示主要 -->
-                        <div class="list-group" id="note-info" style="overflow:auto;">
-                        </div>
-                    </div>
-                </div>
-                <div id="rightNav-tab2" style="width: 100%;height: 100%;">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><i class="glyphicon glyphicon-info-sign"
-                                    aria-hidden="true"></i>&nbsp&nbsp详细信息</h3>
-                        </div>
-                        <div class="panel-body" id="detailInfo" style="height: 100%;">
-                            <!-- 详细信息主要 -->
-
-                        </div>
-                    </div>
-                </div>
-                <!-- 第三个按钮页面 -->
-
-            </div>
-        </div>
-
-    </div>
-
-
-
-
-
-
-
-
-</body>
-<script src="./lib/jquery-1.12.4.min.js"></script>
-<script src="./lib/bootstrap-3.4.1-dist/js/bootstrap.min.js"></script>
-<script type="module" src="./main.js"></script>
+    <script type="module" crossorigin src="./assets/index-b59c48f9.js"></script>
+    <link rel="stylesheet" href="./assets/index-b61d748d.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    
+  </body>
 </html>

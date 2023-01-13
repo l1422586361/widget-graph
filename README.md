@@ -65,9 +65,6 @@
 |**[leolee9086](https://github.com/leolee9086)**|[leolee9086/cc-baselib](https://github.com/leolee9086/cc-baselib)|*Unknown*|
 |**[Zuoqiu-Yingyi](https://github.com/Zuoqiu-Yingyi)**|[Zuoqiu-Yingyi/widget-query](https://github.com/Zuoqiu-Yingyi/widget-query)|*Unknown*|
 
-# 待完善问题
-
-- 节点过多时看上去有些乱，后续加个筛选窗口/功能
 
 
 ## 开发调试
@@ -77,6 +74,11 @@
 
 
 # 更新历史
+
+## v2.0
+
+- vue3重构，功能没太大变化，方便后续功能扩展
+- 增加了正反链的列表面板
 
 ## v1.2.2
 
