@@ -27,14 +27,14 @@ export function useToolsItem() {
     {
       name: "test",
       title: "测试",
-      enable: true,
+      enable: false,
       icon: markRaw(Share),
 
     },
     {
       name: "test2",
       title: "测试",
-      enable: true,
+      enable: false,
       icon: markRaw(Share),
 
     },
