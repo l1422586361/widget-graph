@@ -9,6 +9,9 @@ import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import { getBlockByID } from '../utils/api.js';
 import ToolsBar from './ToolsBar.vue';
+import { useGraphDataStore } from '../store/graphdata'
+import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
+import { config } from '../js/config.js'
 
 
 let myGraph
@@ -20,6 +23,7 @@ let toolsBarRef = ref(null)
 
 
 const graphData = ref(useInitData())
+// const graphData = useGraphDataStore();
 
 
 async function createInitData(){
@@ -127,14 +131,20 @@ function changeSizeGraph(width, heigth) {
 
 function clearGraph(){
     myGraph.clear()
+    graphData.value = useInitData()
 }
 
 </script>
 <template>
-    <ToolsBar v-bind:graphData="graphData" v-on:update:graphData="updateGraphData" v-on:clearGraph="clearGraph" :activeNode="activeNode"
-        ref="toolsBarRef" v-on:flushGraphLayout="flushGraphLayout" v-on:changeSizeGraph="changeSizeGraph"></ToolsBar>
-        <div id="mountNode">
-        </div>
+    <ToolsBar 
+    v-bind:graphData="graphData" 
+    v-on:update:graphData="updateGraphData" 
+    v-on:clearGraph="clearGraph" 
+    :activeNode="activeNode"
+    ref="toolsBarRef" 
+    v-on:flushGraphLayout="flushGraphLayout" 
+    v-on:changeSizeGraph="changeSizeGraph" />
+    <div id="mountNode"></div>
 
 </template>
 
