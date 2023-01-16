@@ -217,7 +217,9 @@ function handleBeforeUpload(file) {
         // let res = new Uint8Array(e.target.result)
         // let snippets = new TextDecoder('gb2312').decode(res);
         // console.log(res)
-        emit('update:graphData', res)
+        graphData.value = res
+        updateGraphData()
+        // emit('update:graphData', res)
     }
 }
 
