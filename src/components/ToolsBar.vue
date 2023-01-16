@@ -15,6 +15,7 @@ import { useToolsItem } from '../data/useToolsItem.js';
 import { config } from '../js/config.js'
 import SearchCard from './SearchCard.vue'
 import DetailCard from "./DetailCard.vue";
+// import FileSaver from "file-saver"
 
 
 const graphData = inject('graphData')
@@ -157,7 +158,13 @@ async function toggleRightWindows(v) {
         console.log("saveData", saveData)
         try {
             let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
-            let saveDataBlob = new Blob([JSON.stringify(saveData)], { type: 'application/json' })
+            let saveDataBlob = new Blob([JSON.stringify(saveData,function(key,value){
+                // 处理循环引用的问题
+                if(['parent','model','canvas','item','sourceNode','targetNode'].indexOf(key)  !== -1){
+                    return
+                }
+                return value
+            })], { type: 'application/json' })
             let 数据文件 = new File([saveDataBlob], `graphf${nodeid}.json`, { lastModified: Date.now() })
             let data = new FormData
             data.append('assetsDirPath', config.dataSavePath)
@@ -175,12 +182,29 @@ async function toggleRightWindows(v) {
             alert('保存成功')
         } catch {
             console.log(saveData)
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData,function(key,value){
+                // 处理循环引用的问题
+                if(['parent','model','canvas','item','sourceNode','targetNode'].indexOf(key)  !== -1){
+                    return
+                }
+                return value
+            }));
             let downloadAnchorNode = document.createElement('a')
             await downloadAnchorNode.setAttribute("href", dataStr);
             await downloadAnchorNode.setAttribute("download", "result.json")
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
+
+
+
+            // let blob = new Blob([JSON.stringify(saveData,function(key,value){
+            //     // 处理循环引用的问题
+            //     if(['parent','model','canvas','item','sourceNode','targetNode'].indexOf(key)  !== -1){
+            //         return
+            //     }
+            //     return value
+            // })],{ type: 'application/json' })
+            // FileSaver.saveAs(blob,`result.json`)
         }
     }
 
