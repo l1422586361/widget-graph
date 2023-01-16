@@ -23,7 +23,7 @@ let toolsBarRef = ref(null)
 
 const graphData = ref(useInitData())
 // const graphData = useGraphDataStore();
-
+provide('graphData',graphData)
 
 async function createInitData(){
     // data = reactive(useInitData())

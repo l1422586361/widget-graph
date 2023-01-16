@@ -1,6 +1,6 @@
 
 <script setup>
-import { ref, onMounted, watch, reactive } from 'vue'
+import { ref, onMounted, watch, reactive, inject } from 'vue'
 // import { useToolsItem } from '../data/useToolsItem.js'
 // import { Search } from '@element-plus/icons-vue'
 import { fullTextSearchBlock, getBlockByID } from '../utils/api.js'
@@ -17,7 +17,7 @@ import SearchCard from './SearchCard.vue'
 import DetailCard from "./DetailCard.vue";
 
 
-
+const graphData = inject('graphData')
 let showRightWindows = ref('')
 let toolItem = ref(useToolsItem())
 // let drawer = ref(false)
@@ -36,10 +36,6 @@ defineExpose({
 })
 const props = defineProps(
     {
-        graphData: {
-            type: Object,
-            default: () => { },
-        },
         activeNode: {
             type: Object,
             default: () => { },
@@ -49,7 +45,7 @@ const props = defineProps(
 
 
 function updateGraphData() {
-    emit('update:graphData', props.graphData)
+    emit('update:graphData', graphData.value)
 }
 
 async function toggleRightWindows(v) {
@@ -69,7 +65,7 @@ async function toggleRightWindows(v) {
     if (v === 'test') {
         // let node = { id: '20220606093400-r0y6l0z', label: '111111' }
         let node = { id: '20220402091807-01pjx5g', label: '111111' }
-        await addNode(props.graphData, node)
+        await addNode(graphData.value, node)
         // updateGraphData()
         // test2()
         getBlockByID(node.id).then(e => {
@@ -93,7 +89,7 @@ async function toggleRightWindows(v) {
                         // expand1LayerOfRelationship()
                         await getBlockByID(e.root_id).then(async e => {
                             console.log(nodeid, e.root_id)
-                            await expand1LayerOfRelationship(props.graphData, e.root_id, e.fcontent)
+                            await expand1LayerOfRelationship(graphData.value, e.root_id, e.fcontent)
                             // await myGraph.changeData(data)
                             updateGraphData()
                         })
@@ -104,7 +100,7 @@ async function toggleRightWindows(v) {
                 }
             }).then(async res => {
                 // console.log(await res.json(),2222)
-                props.graphData = res
+                graphData.value = res
                 updateGraphData()
             }).catch(err => {
                 console.log('window.onload ', err)
@@ -118,27 +114,27 @@ async function toggleRightWindows(v) {
         }
     }
     if (v === 'NodeLight') {
-        props.graphData = await nodeLight(props.graphData)
+        graphData.value = await nodeLight(graphData.value)
         updateGraphData()
-        console.log(props.graphData)
+        console.log(graphData.value)
     }
     if (v === 'getAll') {
         // console.log(111)
-        console.log(props.graphData)
+        console.log(graphData.value)
         await getAllLinks().then(async e => {
             // console.log(e)
             for (let link of e) {
                 let sourceNode = { id: link.sourceId, label: link.sourceDesc }
                 let targetNode = { id: link.targetId, label: link.targetDesc }
                 let edge = { source: link.targetId, target: link.sourceId }
-                await addNode(props.graphData, sourceNode)
-                await addNode(props.graphData, targetNode)
-                await addEdge(props.graphData, edge)
+                await addNode(graphData.value, sourceNode)
+                await addNode(graphData.value, targetNode)
+                await addEdge(graphData.value, edge)
             }
 
         })
-        // console.log(props.graphData)
-        // emit('update:graphData', props.graphData)
+        // console.log(graphData.value)
+        // emit('update:graphData', graphData.value)
         updateGraphData()
     }
     if (v === 'flushGraph') {
@@ -154,10 +150,10 @@ async function toggleRightWindows(v) {
         // console.log(uploadRef)
     }
     if (v === 'Save') {
-        let graphData = props.graphData
+        // let graphData = graphData.value
         let saveData = {}
-        saveData.nodes = graphData.nodes
-        saveData.edges = graphData.edges
+        saveData.nodes = graphData.value.nodes
+        saveData.edges = graphData.value.edges
         console.log("saveData", saveData)
         try {
             let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
@@ -178,6 +174,7 @@ async function toggleRightWindows(v) {
             })
             alert('保存成功')
         } catch {
+            console.log(saveData)
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
             let downloadAnchorNode = document.createElement('a')
             await downloadAnchorNode.setAttribute("href", dataStr);
