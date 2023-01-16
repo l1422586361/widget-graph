@@ -144,7 +144,7 @@ export async function nodeLight(graphData){
 where def_block_id in (select id from blocks where type in ('${type}'))
  GROUP BY root_id) t3 on t1.id = t3.id
     where t1.type = 'd' and t1.id in ('${ids}');`
-    await sql(sqldata).then(e => {
+    return await sql(sqldata).then(e => {
         e.forEach(n=>{
             let node = {id:n.id,label:n.fcontent,backcount:n.backcount,frontcount:n.frontcount}
             // 定义节点大小
