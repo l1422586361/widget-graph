@@ -19,6 +19,7 @@
                     <el-descriptions class="result-list" :title="info.fcontent.slice(0, 20)" :column="3" size="default">
                         <template #extra>
                             <el-button-group class="ml-4" size="default">
+                                <el-button size="small" @click="openNote('siyuan://blocks/'+info.id)"><el-icon><Link /></el-icon></el-button>
                                 <el-button size="small" @click="add1Node(info.id, info.fcontent)">+1</el-button>
                                 <el-button size="small" @click="add2Node(info.id, info.fcontent)">+2</el-button>
                                 <el-button size="small" @click="add3Node(info.id, info.fcontent)">+3</el-button>
@@ -45,8 +46,8 @@ import { ref, onMounted, watch, reactive } from 'vue'
 import { fullTextSearchBlock, getBlockByID } from '../utils/api.js'
 import { getDocCount, getDocSort, } from '../js/base.js'
 import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
-
 import { config } from '../js/config.js'
+import { Link } from '@element-plus/icons-vue'
 
 const props = defineProps(
     {
@@ -56,14 +57,23 @@ const props = defineProps(
         }
     })
 const emit = defineEmits(['update:graphData','toggleRightWindows'])
+let input1 = ref('')
+const nodeLists = ref([]) // 关键字查询结果
+
+
+
+
+function openNote(url){
+    window.open(url,'_blank')
+}
 function updateGraphData() {
     emit('update:graphData', props.graphData)
 }
 function closeWindow(){
     emit('toggleRightWindows','Search')
 }
-let input1 = ref('')
-const nodeLists = ref([]) // 关键字查询结果
+
+
 
 async function add1Node(id, desc) {
     await addNode(props.graphData, { id: id, label: desc, style: config.extNodeStyle.style })
