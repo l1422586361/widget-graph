@@ -1,5 +1,5 @@
 
-import { getBacklink, getBlockByID, sql, fullTextSearchBlock, } from "../utils/api.js"
+import { getBacklink, getBlockByID, sql, fullTextSearchBlock,listDocsByPath,getBlockInfo } from "../utils/api.js"
 import { config } from "./config.js";
 const blockType = config.queryBlockType
 const ignoreNote = config.ignoreNote.join('\',\'')
@@ -45,15 +45,90 @@ export async function expand1LayerOfRelationship(graphData,id, desc) {
     await getAllLinks(id).then(async e => {
         // console.log(e)
         for (let link of e) {
-            let node1 = { id: link.sourceId, label: link.sourceDesc }
-            let node2 = { id: link.targetId, label: link.targetDesc }
-            let edge = { source: link.sourceId, target: link.targetId }
-            await addNode(graphData,node1)
-            await addNode(graphData,node2)
-            await addEdge(graphData,edge)
+            await addNode(graphData,{ id: link.sourceId, label: link.sourceDesc })
+            await addNode(graphData,{ id: link.targetId, label: link.targetDesc })
+            await addEdge(graphData,{ source: link.sourceId, target: link.targetId })
         }
     })
+    return graphData
     // console.log(props.graphData)
+}
+
+
+export async function expand2LayerOfRelationship(graphData,id, desc) {
+    let node = { id: id, label: desc }
+    await addNode(graphData,node)
+    await expand1LayerOfRelationship(graphData,id,desc)
+    await getAllLinks(id).then(async e => {
+        // console.log(e)
+        for (let link of e) {
+            await expand1LayerOfRelationship(graphData,link.sourceId,link.sourceDesc)
+            await expand1LayerOfRelationship(graphData,link.targetId,link.targetDesc)
+        }
+    })
+    return graphData
+    // console.log(props.graphData)
+}
+
+export async function expand3LayerOfRelationship(graphData,id, desc) {
+    let node = { id: id, label: desc }
+    await addNode(graphData,node)
+    await expand1LayerOfRelationship(graphData,id,desc)
+    await getAllLinks(id).then(async e => {
+        // console.log(e)
+        for (let link of e) {
+            await expand1LayerOfRelationship(graphData,link.sourceId,link.sourceDesc)
+            await expand1LayerOfRelationship(graphData,link.targetId,link.targetDesc)
+            await Promise.all([getAllLinks(link.sourceId),getAllLinks(link.targetId)]).then(async e => {
+                    for (let link of e[0]) {
+                        await expand1LayerOfRelationship(graphData,link.sourceId,link.sourceDesc)
+                        await expand1LayerOfRelationship(graphData,link.targetId,link.targetDesc)
+                    }
+                    for (let link of e[1]) {
+                        await expand1LayerOfRelationship(graphData,link.sourceId,link.sourceDesc)
+                        await expand1LayerOfRelationship(graphData,link.targetId,link.targetDesc)
+                    }
+            })
+        }
+    })
+
+    return graphData
+    // console.log(props.graphData)
+}
+
+export async function expand1LayerOfSubRelationship(graphData,id,desc){
+    let node = { id: id, label: desc }
+    await addNode(graphData,node)
+    await getBlockInfo(id).then(async e=>{
+        // console.log(e.box,e.path)
+        await listDocsByPath(e.box,e.path).then(e=>{
+            if(e.files.length>0){
+                e.files.forEach(async note => {
+                    await addNode(graphData,{ id: note.id, label: note.name.replace('.sy','') })
+                    await addEdge(graphData,{ source: id, target: note.id })
+                })
+            }
+        })
+    })
+    return graphData
+}
+
+
+export async function expand2LayerOfSubRelationship(graphData,id,desc){
+    let node = { id: id, label: desc }
+    await addNode(graphData,node)
+    await expand1LayerOfSubRelationship(graphData,id,desc)
+    await getBlockInfo(id).then(async e=>{
+        // console.log(e)
+        await listDocsByPath(e.box,e.path).then(async e=>{
+            if(e.files.length>0){
+                for(let note of e.files){
+                    await expand1LayerOfSubRelationship(graphData,note.id,note.name.replace('.sy',''))
+                }
+            }
+        })
+    })
+    return graphData
 }
 
 

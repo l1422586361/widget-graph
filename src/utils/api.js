@@ -50,6 +50,7 @@ export {
     删除块 as deleteBlock,
     更新块 as updateBlock,
     以id获取思源块信息 as getBlockByID,
+    getBlockInfo,
 };
 
 async function 向思源请求数据(url, data) {
@@ -265,9 +266,20 @@ async function 以id获取文档块markdown(文档id) {
     //文档hepath与Markdown 内容
 }
 
-async function 列出指定路径下文档(路径) {
+async function getBlockInfo(id) {
     let data = {
+        id: id
+    }
+    let url = '/api/block/getBlockInfo'
+    return 解析响应体(向思源请求数据(url, data))
+    //文档hepath与Markdown 内容
+}
+
+async function 列出指定路径下文档(笔记本,路径) {
+    let data = {
+        notebook: 笔记本,
         path: 路径,
+        sort: 6
     }
     let url = '/api/filetree/listDocsByPath'
     return 解析响应体(向思源请求数据(url, data))

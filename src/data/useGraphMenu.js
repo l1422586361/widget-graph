@@ -1,6 +1,10 @@
-import { getAllLinks, addNode, addEdge, delNodeEdge,getFrontLinks } from "../js/base.js";
+import { getAllLinks, addNode, addEdge, delNodeEdge,getFrontLinks,expand1LayerOfRelationship,expand2LayerOfRelationship,expand3LayerOfRelationship,expand1LayerOfSubRelationship,expand2LayerOfSubRelationship } from "../js/base.js";
 import { config } from "../js/config.js";
 import { getBacklink } from "../utils/api.js";
+
+
+
+
 export function useGraphMenu() {
     return {
         // https://g6.antv.vision/zh/examples/tool/contextMenu 右侧Menu配置项
@@ -9,7 +13,19 @@ export function useGraphMenu() {
         itemTypes: ['node'],
         getContent(e) {
             return `<ul class="list">
-            <li id="addAll">扩展一层关系</li>
+            <li>扩展引用关系
+                <ul class="g6-component-contextmenu">
+                    <li id="addOneRef">扩展1层引用</li>
+                    <li id="addTwoRef">扩展2层引用</li>
+                    <!-- <li id="addThreeRef">扩展3层引用</li> 加载较长时间且不适用-->
+                </ul>
+            </li>
+            <li>扩展文件树子级
+                <ul class="g6-component-contextmenu">
+                    <li id="addOneSub">扩展子1级</li>
+                    <li id="addTwoSub">扩展子2级</li>
+                </ul>
+            </li>
             <li id="addBacklink">仅扩展反链</li>
             <li id="addFrontlink">仅扩展正链</li>
             <li id="delNodeEdge">删除此节点及关系</li>
@@ -23,32 +39,57 @@ export function useGraphMenu() {
             let nodeDesc = item._cfg.model.label
             // console.log(id)
             switch (target.id) {
-                case "addAll":
+                case "addOneRef":
                     // console.log(target,item,graph)
                     (async () => {
                         // 标记扩展节点
                         let model = config.extNodeStyle
                         graph.updateItem(item,model)
-                        
-                        
-                        let node = { id: nodeId, label: nodeDesc }
-                        await addNode(data, node)
-                        await getAllLinks(nodeId).then(async e => {
-                            console.log(e)
-                            for (let link of e) {
-                                let sourceNode = { id: link.sourceId, label: link.sourceDesc }
-                                let targetNode = { id: link.targetId, label: link.targetDesc }
-                                let edge = { source: link.targetId, target: link.sourceId }
-                                await addNode(data, sourceNode)
-                                await addNode(data, targetNode)
-                                await addEdge(data, edge)
-                            }
-                            // console.log(data)
-                        })
-                        console.log(data)
+                        await expand1LayerOfRelationship(data,nodeId,nodeDesc)
+                        // console.log(data)
                         graph.changeData(data)
                     })()
                     break;
+                case "addTwoRef":
+                    (async ()=>{
+                        let model = config.extNodeStyle
+                        graph.updateItem(item,model)
+                        await expand2LayerOfRelationship(data,nodeId,nodeDesc)
+                        graph.changeData(data)
+                    })()
+                    break;
+                case "addTwoRef":
+                    (async ()=>{
+                        let model = config.extNodeStyle
+                        graph.updateItem(item,model)
+                        await expand2LayerOfRelationship(data,nodeId,nodeDesc)
+                        graph.changeData(data)
+                    })()
+                    break;
+                case "addThreeRef":
+                    (async ()=>{
+                        let date = new Date()
+                        console.log(date.getMinutes(),date.getSeconds())
+                        let model = config.extNodeStyle
+                        graph.updateItem(item,model)
+                        await expand3LayerOfRelationship(data,nodeId,nodeDesc)
+                        graph.changeData(data)
+                        console.log(date.getMinutes(),date.getSeconds())
+                    })()
+                    break;
+                case "addOneSub":
+                    (async ()=>{
+                        await expand1LayerOfSubRelationship(data,nodeId,nodeDesc)
+                        graph.changeData(data)
+                    })()
+                    break;
+                case "addTwoSub":
+                    (async ()=>{
+                        await expand2LayerOfSubRelationship(data,nodeId,nodeDesc)
+                        graph.changeData(data)
+                    })()
+                    break;
+
                 case "addBacklink":
                     (async () => {
                         // 标记扩展节点

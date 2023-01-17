@@ -15,7 +15,7 @@ body {
     /* Chrome Safari */
 }
 
-.g6-component-contextmenu .list {
+.g6-component-contextmenu ul {
     float: left;
     list-style: none;
     padding: 0;
@@ -23,7 +23,7 @@ body {
     z-index: 3;
 }
 
-.g6-component-contextmenu .list li {
+.g6-component-contextmenu ul li {
     width: 150px;
     height: 36px;
     line-height: 36px;
@@ -31,8 +31,40 @@ body {
     color: var(--el-menu-text-color);
     text-align: center;
     cursor: pointer;
+    position: relative;
 }
 
-.g6-component-contextmenu .list li:hover {
+.g6-component-contextmenu ul li:hover {
     background-color: #ecf5ff;
+}
+
+.g6-component-contextmenu ul li ul {
+    display: none;
+    position: absolute;
+    left: 150px;
+    top: 0;
+    line-height: 36px;
+    text-align: center;
+    cursor: pointer;
+    font-size: var(--el-menu-item-font-size);
+    color: var(--el-menu-text-color);
+}
+
+.g6-component-contextmenu ul li ul li {
+    width: 150px;
+    height: 36px;
+    line-height: 36px;
+    font-size: var(--el-menu-item-font-size);
+    color: var(--el-menu-text-color);
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.g6-component-contextmenu ul li a{
+    display: block;
+}
+
+.g6-component-contextmenu ul li:hover ul{
+    display: block;
 }
