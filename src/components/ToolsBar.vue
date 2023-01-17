@@ -20,6 +20,7 @@ import DetailCard from "./DetailCard.vue";
 
 const graphData = inject('graphData')
 let showRightWindows = ref('')
+let showSearchWindows = ref(false)
 let toolItem = ref(useToolsItem())
 // let drawer = ref(false)
 let drawer2 = ref(false)
@@ -50,7 +51,8 @@ function updateGraphData() {
 }
 
 async function toggleRightWindows(v) {
-    if (v === showRightWindows.value) {
+    // console.log(showRightWindows,showSearchWindows)
+    if (v === showRightWindows.value && v!=='Search') {
         showRightWindows.value = ''
         return
     }
@@ -58,6 +60,7 @@ async function toggleRightWindows(v) {
     if ('Search' === v) {
         // drawer.value = true
         // console.log(1,drawer.value,drawer2.value,showRightWindows.value)
+        showSearchWindows.value = !showSearchWindows.value
         return
     }
     if ('Info' === v) {
@@ -275,7 +278,7 @@ function handleBeforeUpload(file) {
     <search-card
     :graph-data="graphData"
     v-on:update:graphData="updateGraphData"
-    v-if="showRightWindows==='Search'"
+    v-if="showSearchWindows"
     v-on:toggleRightWindows="toggleRightWindows"
     ></search-card>
 
