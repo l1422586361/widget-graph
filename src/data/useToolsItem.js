@@ -4,7 +4,7 @@ import {
   Upload,
   UploadFilled,
   Refresh,
-  MagicStick,
+  MagicStick,ZoomOut,ZoomIn,CaretRight,CaretLeft,FullScreen,ScaleToOriginal,
   Delete
 } from "@element-plus/icons-vue";
 import { markRaw } from "vue";
@@ -16,12 +16,42 @@ export function useToolsItem() {
       enable: true,
       icon: markRaw(Search),
 
+    },{
+      name: "undo",
+      title: "撤销",
+      enable: true,
+      icon: markRaw(CaretLeft),
+
     },
     {
-      name: "Info",
-      title: "信息测试",
-      enable: false,
-      icon: markRaw(Share),
+      name: "redo",
+      title: "重做",
+      enable: true,
+      icon: markRaw(CaretRight),
+
+    },{
+      name: "zoomOut",
+      title: "放大",
+      enable: true,
+      icon: markRaw(ZoomIn),
+
+    },{
+      name: "zoomIn",
+      title: "缩小",
+      enable: true,
+      icon: markRaw(ZoomOut),
+
+    },{
+      name: "autoZoom",
+      title: "适应屏幕",
+      enable: true,
+      icon: markRaw(ScaleToOriginal),
+
+    },{
+      name: "realZoom",
+      title: "实际大小",
+      enable: true,
+      icon: markRaw(FullScreen),
 
     },
     {

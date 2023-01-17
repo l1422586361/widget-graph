@@ -96,8 +96,9 @@ const createGraph = () => {
     pageWidth = document.documentElement.clientWidth
     pageHeight = document.documentElement.clientHeight
     let contextMenu = new G6.Menu(useGraphMenu())
+    let toolBar = new G6.ToolBar()
     // myGraph = new G6.Graph(useGraphOptions('mountNode', pageWidth, pageHeight))
-    myGraph = new G6.Graph(useGraphOptions('mountNode', pageWidth, pageHeight, [contextMenu]))
+    myGraph = new G6.Graph(useGraphOptions('mountNode', pageWidth, pageHeight, [contextMenu,toolBar]))
     // myGraph = new G6.Graph(画布配置)
     myGraph.data(data)
     myGraph.render()
@@ -125,7 +126,8 @@ const createGraph = () => {
 
 function updateGraphData(v) {
     // console.log(v)
-    myGraph.changeData(v)
+    console.log(1111)
+    myGraph.changeData(v,true)
 }
 
 function flushGraphLayout() {

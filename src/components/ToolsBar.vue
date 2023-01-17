@@ -52,6 +52,13 @@ function updateGraphData() {
 
 async function toggleRightWindows(v) {
     // console.log(showRightWindows,showSearchWindows)
+    if(['undo','redo','zoomOut','zoomIn','realZoom','autoZoom'].indexOf(v) != -1){
+        document.querySelector(".g6-component-toolbar li[code='"+v+"']").click()
+        // console.log(a)
+        return
+    }
+
+
     if (v === showRightWindows.value && v!=='Search') {
         showRightWindows.value = ''
         return
@@ -67,55 +74,15 @@ async function toggleRightWindows(v) {
         return
     }
     if (v === 'test') {
-        // let node = { id: '20220606093400-r0y6l0z', label: '111111' }
-        let node = { id: '20220402091807-01pjx5g', label: '111111' }
-        await addNode(graphData.value, node)
-        // updateGraphData()
-        // test2()
-        getBlockByID(node.id).then(e => {
-            console.log(1231, e)
-        })
-    }
-    if (v === 'test2') {
-        // let node = { id: '20220606093400-r0y6l0z', label: '111111' }
-        let node = { id: '20220402091807-01pjx5g', label: '111111' }
-        try {
-            // let nodeid = node.id
-            let data=reactive(useInitData())
-            let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
-            await fetch(`${config.dataSavePath}/graph-${nodeid}.json`).then(async res => {
-                if (res.status == 404) {
-                    await getBlockByID(nodeid).then(async e => {
-                        // addNode(graph,e.root_id,'')
-
-                        // await expand1LayerOfRelationship(e.root_id, graph)
-                        // await updateNodeToMain(graph, e.root_id)
-                        // expand1LayerOfRelationship()
-                        await getBlockByID(e.root_id).then(async e => {
-                            console.log(nodeid, e.root_id)
-                            await expand1LayerOfRelationship(graphData.value, e.root_id, e.fcontent)
-                            // await myGraph.changeData(data)
-                            updateGraphData()
-                        })
-
-                    })
-                } else {
-                    return res
-                }
-            }).then(async res => {
-                // console.log(await res.json(),2222)
-                graphData.value = res
-                updateGraphData()
-            }).catch(err => {
-                console.log('window.onload ', err)
-            })
-            // getBlockByID(nodeid).then(e => {
-            //     expand1LayerOfRelationship(e.root_id, graph)
-            // })
-        } catch (err) {
-            console.warn(err);
-            console.log("当前不在思源文档内部")
-        }
+        // 适应屏幕 autoZoom
+        // 重做 redo 
+        // 撤销 undo
+        // 放大 zoomOut
+        // 缩小 zoomIn
+        // 实际大小 realZoom
+        let a = document.querySelector(".g6-component-toolbar li[code='autoZoom']")
+        console.log(a)
+        a.click()
     }
     if (v === 'NodeLight') {
         graphData.value = await nodeLight(graphData.value)

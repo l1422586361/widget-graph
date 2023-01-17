@@ -68,3 +68,7 @@ body {
 .g6-component-contextmenu ul li:hover ul{
     display: block;
 }
+
+.g6-component-toolbar {
+    display: none;
+}
