@@ -130,7 +130,7 @@ async function add3Node(id, desc) {
 <style scoped>
 .card {
     position: absolute;
-    right: 0;
+    left: 0;
     height: 95%;
     /* width: 400px; */
 }

@@ -58,6 +58,7 @@ async function createInitData(){
             //     expand1LayerOfRelationship(e.root_id, graph)
             // })
         } catch (err) {
+            await toolsBarRef.value.toggleRightWindows('Search')
             console.warn(err);
             console.log("当前不在思源文档内部")
         }
