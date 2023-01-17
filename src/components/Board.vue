@@ -161,4 +161,7 @@ function clearGraph(){
     width: auto;
     color: aliceblue;
 }
+#mountNode {
+    background: white;
+}
 </style>
