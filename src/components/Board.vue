@@ -140,6 +140,35 @@ function clearGraph(){
     graphData.value = useInitData()
 }
 
+
+G6.registerNode('rect-note',(cfg)=>`<group>
+<rect style={{
+    width: 100,max-width: 200, height: 20, fill: '#1890ff', stroke: '#1890ff', radius: [6, 6, 0, 0]
+  }} keyshape="true" name="test">
+    <text style={{ 
+			marginTop: 2, 
+			marginLeft: 50, 
+      textAlign: 'center', 
+      fontWeight: 'bold', 
+      fill: '#fff' }} 
+			name="title">${cfg.label || cfg.id}</text>
+    
+  </rect>
+  <rect style={{ width: 100,max-width: 200, height: auto, fill: 'rgba(24,144,255,0.15)', 
+		radius: [0, 0, 6, 6] }} 
+		keyshape="true" 
+		cursor="move">
+    <text style={{marginLeft: 10 ,fill: 'red',width: 100,word-wrap : break-word}}>${cfg.content}</text>
+    
+    </rect></group>
+`)
+
+
+
+
+
+
+
 </script>
 <template>
     <tools-bar 
