@@ -3,6 +3,7 @@ import { getBacklink, getBlockByID, sql, fullTextSearchBlock,listDocsByPath,getB
 import { config } from "./config.js";
 const blockType = config.queryBlockType
 const ignoreNote = config.ignoreNote.join('\',\'')
+import G6 from '@antv/g6'
 
 export async function hasNode(graphData, id) {
     // flase 不存在
@@ -47,7 +48,13 @@ export async function expand1LayerOfRelationship(graphData,id, desc) {
         for (let link of e) {
             await addNode(graphData,{ id: link.sourceId, label: link.sourceDesc })
             await addNode(graphData,{ id: link.targetId, label: link.targetDesc })
-            await addEdge(graphData,{ source: link.sourceId, target: link.targetId })
+            await addEdge(graphData,{ source: link.sourceId, target: link.targetId ,style:{
+                endArrow:{
+                    path: G6.Arrow.vee(10, 20, 0),
+                    d: 0,
+                    fill: "#FFCC99"
+                }
+            }})
         }
     })
     return graphData
@@ -105,7 +112,7 @@ export async function expand1LayerOfSubRelationship(graphData,id,desc){
             if(e.files.length>0){
                 e.files.forEach(async note => {
                     await addNode(graphData,{ id: note.id, label: note.name.replace('.sy','') })
-                    await addEdge(graphData,{ source: id, target: note.id })
+                    await addEdge(graphData,{ source: id, target: note.id})
                 })
             }
         })
