@@ -48,7 +48,7 @@ export async function expand1LayerOfRelationship(graphData,id, desc) {
         for (let link of e) {
             await addNode(graphData,{ id: link.sourceId, label: link.sourceDesc })
             await addNode(graphData,{ id: link.targetId, label: link.targetDesc })
-            await addEdge(graphData,{ source: link.sourceId, target: link.targetId ,style:{
+            await addEdge(graphData,{ source: link.targetId, target: link.sourceId ,style:{
                 endArrow:{
                     path: G6.Arrow.vee(10, 20, 0),
                     d: 0,
