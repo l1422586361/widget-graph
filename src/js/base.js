@@ -252,62 +252,60 @@ where def_block_id in (select id from blocks where type in ('${type}'))
 }
 
 
-
-export async function delNodeEdge(obj, nodeid) {
-    let itemNode = obj.findById(nodeid);
-    obj.removeItem(itemNode);
-    let item = []
+export async function delNodeEdge(obj,nodeid){
+    let data = obj.save()
+    let dataNew = {nodes: [],edges: [],combos: []}
+    let delnodeIds = []
+    let deledgeIds = []
+    delnodeIds.push(nodeid)
+    // 查出所有的正链连线
     let itemEdgeFront = obj.findAll('edge', (e) => {
-        // 正链
-        return e.get('model').source == nodeid;
+        return e.get('model').source == nodeid;  // source一样
     })
+    // 查出所有的反链连线
     let itemEdgeBack = obj.findAll('edge', (e) => {
-        // 反链
-        return e.get('model').target == nodeid;
+        return e.get('model').target == nodeid;   // target一样
     })
-    // console.log(itemNode, itemEdgeBack, itemEdgeFront)
+
+    // 提取所有正链连线ID，判断对面的nodeID是否删除
     if (itemEdgeFront.length != 0) {
         for (let edge of itemEdgeFront) {
-            item.push(edge._cfg.id)
+            deledgeIds.push(edge._cfg.id)
+            // console.log(edge._cfg.model.target)
+            // console.log(obj.getNodeDegree(edge._cfg.model.target),delnodeIds.indexOf(edge._cfg.model.target))
+            if(obj.getNodeDegree(edge._cfg.model.target) == 1 && delnodeIds.indexOf(edge._cfg.model.target) == -1){
+                // 对面node总度数为1且为加入到待删除节点中
+                delnodeIds.push(edge._cfg.model.target)
+            }
         }
     }
+    // 提取所有反链连线ID，判断对面的nodeID是否删除
     if (itemEdgeBack.length != 0) {
-        for (let edge of itemEdgeFront) {
-            item.push(edge._cfg.id)
+        for (let edge of itemEdgeBack) {
+            // console.log(edge)
+            deledgeIds.push(edge._cfg.id)
+            if(obj.getNodeDegree(edge._cfg.model.source) == 1 && delnodeIds.indexOf(edge._cfg.model.source) == -1){
+                // 对面node总度数为1且为加入到待删除节点中
+                // console.log(123,delnodeIds.indexOf(edge._cfg.model.source) != -1)
+                delnodeIds.push(edge._cfg.model.source)
+            }
         }
     }
-    // console.log("item",item)
-    for (let id of item) {
-        // 删除涉及需删除节点的边
-        obj.removeItem(obj.findById(id));
-    }
-
-    // console.log(obj.save())
-    clearInvalidNodes(obj)
-
-}
-
-
-export async function clearInvalidNodes(obj) {
-    // 清除画布上无连线的节点
-    let nodeIds = []
-    let edgeIds = []
-    console.log(obj.getNodes(), obj.getEdges())
-    for (let e of obj.getNodes()) {
-        nodeIds.push(e._cfg.id)
-    }
-    for (let e of obj.getEdges()) {
-        edgeIds.push(e._cfg.model.source)
-        edgeIds.push(e._cfg.model.target)
-    }
-    console.log("node,edge", nodeIds, edgeIds)
-    for (let nodeid of nodeIds) {
-        console.log(nodeid)
-        if (edgeIds.indexOf(nodeid) == -1) {
-            obj.removeItem(obj.findById(nodeid));
+    // console.log('del',delnodeIds,deledgeIds)
+    data.edges.forEach(e=>{
+        // console.log(e.source,e.target,delnodeIds.indexOf(e.source)==-1, delnodeIds.indexOf(e.target)==-1)
+        if(delnodeIds.indexOf(e.source)==-1 && delnodeIds.indexOf(e.target)==-1){
+            dataNew.edges.push(e)
         }
-    }
+    })
+    data.nodes.forEach(e=>{
+        if(delnodeIds.indexOf(e.id)==-1){
+            dataNew.nodes.push(e)
+        }
+    })
+    obj.changeData(dataNew)
 }
+
 
 export async function getFrontLinks(nodeid) {
     // 获取正链链接
