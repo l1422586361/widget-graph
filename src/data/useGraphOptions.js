@@ -7,6 +7,7 @@ export function useGraphOptions(container, width, height, plugins) {
         fitViewPadding: [20, 40, 50, 20],
         // workerEnabled: true,
         plugins,
+        enabledStack: true,
         layout: {
             // type: 'forceAtlas2',
             type: 'force',

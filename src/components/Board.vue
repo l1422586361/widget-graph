@@ -125,9 +125,7 @@ const createGraph = () => {
 
 
 function updateGraphData(v) {
-    // console.log(v)
-    console.log(1111)
-    myGraph.changeData(v,true)
+    myGraph.changeData(v)
 }
 
 function flushGraphLayout() {
