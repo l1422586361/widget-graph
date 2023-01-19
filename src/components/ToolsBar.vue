@@ -5,7 +5,7 @@ import { ref, onMounted, watch, reactive, inject } from 'vue'
 // import { Search } from '@element-plus/icons-vue'
 import { fullTextSearchBlock, getBlockByID } from '../utils/api.js'
 import { getDocCount, getDocSort, } from '../js/base.js'
-import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
+import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge } from '../js/base.js'
 import {
     Mouse,
     Search
@@ -31,7 +31,7 @@ let drawer2 = ref(false)
 const uploadRef = ref(null)
 
 
-const emit = defineEmits(['update:graphData', 'flushGraphLayout', 'changeSizeGraph', 'clearGraph'])
+const emit = defineEmits(['update:graphData', 'flushGraphLayout', 'changeSizeGraph'])
 defineExpose({
     toggleRightWindows,
     showRightWindows
@@ -84,98 +84,9 @@ async function toggleRightWindows(v) {
         console.log(a)
         a.click()
     }
-    if (v === 'NodeLight') {
-        graphData.value = await nodeLight(graphData.value)
-        updateGraphData()
-        console.log(graphData.value)
-    }
-    if (v === 'getAll') {
-        // console.log(111)
-        console.log(graphData.value)
-        await getAllLinks().then(async e => {
-            // console.log(e)
-            for (let link of e) {
-                let sourceNode = { id: link.sourceId, label: link.sourceDesc }
-                let targetNode = { id: link.targetId, label: link.targetDesc }
-                let edge = { source: link.targetId, target: link.sourceId }
-                await addNode(graphData.value, sourceNode)
-                await addNode(graphData.value, targetNode)
-                await addEdge(graphData.value, edge)
-            }
-
-        })
-        // console.log(graphData.value)
-        // emit('update:graphData', graphData.value)
-        updateGraphData()
-    }
     if (v === 'flushGraph') {
         // props.myGraph.layout()
         emit('flushGraphLayout')
-    }
-    if (v === 'Clear') {
-        emit('clearGraph')
-    }
-    if (v === 'Import') {
-        // uploadRef.value.dispatchEvent(new MouseEvent('click'))
-        document.querySelector(".el-upload").click()
-        // console.log(uploadRef)
-    }
-    if (v === 'Save') {
-        // let graphData = graphData.value
-        let saveData = {}
-        saveData.nodes = graphData.value.nodes
-        saveData.edges = graphData.value.edges
-        console.log("saveData", saveData)
-        try {
-            let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
-            let saveDataBlob = new Blob([JSON.stringify(saveData,function(key,value){
-                // 处理循环引用的问题
-                if(['parent','model','canvas','item','sourceNode','targetNode'].indexOf(key)  !== -1){
-                    return
-                }
-                return value
-            })], { type: 'application/json' })
-            let 数据文件 = new File([saveDataBlob], `graphf${nodeid}.json`, { lastModified: Date.now() })
-            let data = new FormData
-            data.append('assetsDirPath', config.dataSavePath)
-            data.append('file[]', 数据文件)
-            let url = '/api/asset/upload'
-            // let filepath = ""
-            await fetch(url, {
-                body: data,
-                method: 'POST',
-                headers: { 'Authorization': `Token ${config.token}` },
-            }).then(function (response) {
-                console.log(response)
-                return response.json()
-            })
-            alert('保存成功')
-        } catch {
-            console.log(saveData)
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData,function(key,value){
-                // 处理循环引用的问题
-                if(['parent','model','canvas','item','sourceNode','targetNode'].indexOf(key)  !== -1){
-                    return
-                }
-                return value
-            }));
-            let downloadAnchorNode = document.createElement('a')
-            await downloadAnchorNode.setAttribute("href", dataStr);
-            await downloadAnchorNode.setAttribute("download", "result.json")
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-
-
-
-            // let blob = new Blob([JSON.stringify(saveData,function(key,value){
-            //     // 处理循环引用的问题
-            //     if(['parent','model','canvas','item','sourceNode','targetNode'].indexOf(key)  !== -1){
-            //         return
-            //     }
-            //     return value
-            // })],{ type: 'application/json' })
-            // FileSaver.saveAs(blob,`result.json`)
-        }
     }
 
 }

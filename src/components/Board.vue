@@ -136,17 +136,12 @@ function changeSizeGraph(width, heigth) {
     myGraph.changeSize(width, heigth)
 }
 
-function clearGraph(){
-    myGraph.clear()
-    graphData.value = useInitData()
-}
 
 </script>
 <template>
     <tools-bar 
     v-bind:graphData="graphData" 
     v-on:update:graphData="updateGraphData" 
-    v-on:clearGraph="clearGraph" 
     :activeNode="activeNode"
     ref="toolsBarRef" 
     v-on:flushGraphLayout="flushGraphLayout" 

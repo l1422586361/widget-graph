@@ -71,21 +71,21 @@ export function useToolsItem() {
     {
       name: "getAll",
       title: "全局关系图",
-      enable: true,
+      enable: false, // 迁移至画布右键
       icon: markRaw(Operation),
       handler: 'getAllGraph',
     },
     {
       name: "Import",
       title: "导入数据",
-      enable: true,
+      enable: false, // 迁移至画布右键
       icon: markRaw(Upload),
 
     },
     {
       name: "Save",
       title: "保存数据",
-      enable: true,
+      enable: false, // 迁移至画布右键
       icon: markRaw(UploadFilled),
 
     },
@@ -99,14 +99,14 @@ export function useToolsItem() {
     {
       name: "NodeLight",
       title: "超级节点高亮",
-      enable: true,
+      enable: false, // 迁移至画布右键
       icon: markRaw(MagicStick),
 
     },
     {
       name: "Clear",
       title: "清除画布",
-      enable: true,
+      enable: false, // 迁移至画布右键
       icon: markRaw(Delete),
 
     },
