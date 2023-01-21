@@ -202,7 +202,7 @@ function handleBeforeUpload(file) {
 
 .btn-group {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
     width: fit-content;

@@ -4,11 +4,12 @@ import BoardVue from "./components/Board.vue";
 import ToolsBarVue from "./components/ToolsBar.vue";
 import SearchCard from "./components/SearchCard.vue";
 import DetailCard from "./components/DetailCard.vue";
-
+import headers from "./components/Headers.vue";
 
 </script>
 
 <template>
+  <headers></headers>
   <!-- <ToolsBarVue></ToolsBarVue> -->
   <!-- <search-card></search-card> -->
   <!-- <RightWindow1Search></RightWindow1Search> -->
