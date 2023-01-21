@@ -48,6 +48,7 @@ import { getDocCount, getDocSort, } from '../js/base.js'
 import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
 import { config } from '../js/config.js'
 import { Link } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
 
 const props = defineProps(
     {

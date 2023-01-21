@@ -59,7 +59,7 @@ async function createInitData(){
             // })
         } catch (err) {
             await toolsBarRef.value.toggleRightWindows('Search')
-            console.warn(err);
+            // console.log(err);
             console.log("当前不在思源文档内部")
         }
     
