@@ -84,7 +84,7 @@ async function randomNote() {
       window.open("siyuan://blocks/" + 待查看id);
       break;
     } else if (
-      (new Date(today) -new Date(获取数组里指定元素(待查看id, 已查看数据).rq)) /(1000 * 60 * 60 * 24) <=7 ) {
+      (new Date(today) -new Date(获取数组里指定元素(待查看id, 已查看数据).rq)) /(1000 * 60 * 60 * 24) >=7 ) {
       // 打开文档，修改id
       for (let r in 已查看数据) {
         if (已查看数据[r].id == 待查看id) {

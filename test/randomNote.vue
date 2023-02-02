@@ -100,7 +100,7 @@ async function open() {
     } else if (
       (new Date(today) -
         new Date(获取数组里指定元素(待查看id, 已查看数据).rq)) /
-        (1000 * 60 * 60 * 24) <=
+        (1000 * 60 * 60 * 24) >=
       7
     ) {
       console.log(222);
