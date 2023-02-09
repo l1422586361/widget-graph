@@ -69,11 +69,19 @@
 
 ## 开发调试
 
-- docker run -d -v /files/git/siyuan_dev:/siyuan/workspace -v /files/git/widget-graph:/siyuan/workspace/data/widgets/widget-graph  --name siyuan_dev -p 6807:6806 -u root:root b3log/siyuan:latest --workspace=/siyuan/workspace/
+- docker run -d -v /pathtosiyuan:/siyuan/workspace  --name siyuan_dev -p 6807:6806 -u root:root b3log/siyuan:latest --workspace=/siyuan/workspace/
 - http://127.0.0.1:6806/widgets/widget-graph/
+- npm i 
+- npm run dev/build
+- cp -r dist /pathtosiyuan/data/widgets/widget-graph
 
 
 # 更新历史
+
+## v2.1.1
+
+- 增加对顶栏按钮的支持，需增加顶栏按钮需补充代码块到思源代码段配置里
+- 迁移部分功能按钮至画布右键交互
 
 ## v2.1.0
 
