@@ -15,6 +15,28 @@ export async function hasNode(graphData, id) {
 
 }
 
+// 获取当前文档id———插件版本
+// 作者：zxhd86
+// 链接：https://ld246.com/article/1675844040873
+
+export function getFileID() {
+    //获取当前屏幕
+    // const currentScreen = document.querySelector(".layout__wnd--active")
+    const currentScreen = window.frameElement.parentElement.parentElement.parentElement.parentElement.querySelector("#layouts")
+    console.log("currentScreen====",currentScreen)
+    //获取当前页面
+    const currentPage = currentScreen.querySelector(
+        ".fn__flex-1.protyle:not(.fn__none)"
+    );
+    console.log("currentPage====",currentPage)
+    //获取当前页面id
+    const currentPageID = currentPage.querySelector(
+        "span.protyle-breadcrumb__item--active"
+    ).getAttribute("data-node-id");
+    console.log("currentPageID====",currentPageID)
+    return currentPageID;
+}
+
 export async function hasEdge(graphData, edge) {
     // flase 不存在
     if (graphData.edges.map(e => { return e.source }).indexOf(edge.source) === -1) {

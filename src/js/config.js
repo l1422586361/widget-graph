@@ -25,7 +25,8 @@ export var config = {
         },
     },
     queryBlockType: ['d'],  // 查询的块类型筛选，仅保留文档块，避免太多干扰信息
-    dataSavePath: '/assets/graph-data',
+    dataReadPath: '/assets/graph-data',
+    dataSavePath: '/data/assets/graph-data',
 }
 
 

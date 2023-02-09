@@ -9,7 +9,7 @@ import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import { getBlockByID } from '../utils/api.js';
 import ToolsBar from './ToolsBar.vue';
-import { getAllLinks, addNode, expand1LayerOfRelationship,expand2LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
+import { getAllLinks, addNode, expand1LayerOfRelationship,expand2LayerOfRelationship, addEdge, nodeLight,getFileID } from '../js/base.js'
 import { config } from '../js/config.js'
 
 
@@ -35,7 +35,7 @@ async function createInitData(){
                 nodeid = getFileID()
                 console.log("fileid=====",nodeid)
             }
-            await fetch(`${config.dataSavePath}/graph-${nodeid}.json`).then(async res => {
+            await fetch(`${config.dataReadPath}/graph-${nodeid}.json`).then(async res => {
                 if (res.status == 404) {
                     await getBlockByID(nodeid).then(async e => {
                         // addNode(graph,e.root_id,'')
@@ -70,27 +70,7 @@ async function createInitData(){
     
 }
 
-// 获取当前文档id———插件版本
-// 作者：zxhd86
-// 链接：https://ld246.com/article/1675844040873
 
-function getFileID() {
-    //获取当前屏幕
-    // const currentScreen = document.querySelector(".layout__wnd--active")
-    const currentScreen = window.frameElement.parentElement.parentElement.parentElement.parentElement.querySelector("#layouts")
-    console.log("currentScreen====",currentScreen)
-    //获取当前页面
-    const currentPage = currentScreen.querySelector(
-        ".fn__flex-1.protyle:not(.fn__none)"
-    );
-    console.log("currentPage====",currentPage)
-    //获取当前页面id
-    const currentPageID = currentPage.querySelector(
-        "span.protyle-breadcrumb__item--active"
-    ).getAttribute("data-node-id");
-    console.log("currentPageID====",currentPageID)
-    return currentPageID;
-}
 
 
 onMounted(() => {

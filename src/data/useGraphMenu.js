@@ -1,4 +1,4 @@
-import { getAllLinks, addNode, addEdge, delNodeEdge, getFrontLinks, expand1LayerOfRelationship, expand2LayerOfRelationship, expand3LayerOfRelationship, expand1LayerOfSubRelationship, expand2LayerOfSubRelationship, nodeLight } from "../js/base.js";
+import { getAllLinks, addNode, addEdge, delNodeEdge, getFrontLinks, expand1LayerOfRelationship, expand2LayerOfRelationship, expand3LayerOfRelationship, expand1LayerOfSubRelationship, expand2LayerOfSubRelationship, nodeLight,getFileID } from "../js/base.js";
 import { config } from "../js/config.js";
 import { getBacklink } from "../utils/api.js";
 import { useInitData } from '../data/useInitData.js'
@@ -178,6 +178,10 @@ export function useGraphMenu() {
                         console.log("saveData", saveData)
                         try {
                             let nodeid = window.frameElement.parentElement.parentElement.dataset.nodeId
+                            if(!nodeid){
+                                nodeid = getFileID()
+                                // console.log("fileid=====",nodeid)
+                            }
                             let saveDataBlob = new Blob([JSON.stringify(saveData, function (key, value) {
                                 // 处理循环引用的问题
                                 if (['parent', 'model', 'canvas', 'item', 'sourceNode', 'targetNode'].indexOf(key) !== -1) {
@@ -185,11 +189,11 @@ export function useGraphMenu() {
                                 }
                                 return value
                             })], { type: 'application/json' })
-                            let 数据文件 = new File([saveDataBlob], `graphf${nodeid}.json`, { lastModified: Date.now() })
+                            let 数据文件 = new File([saveDataBlob], `graph-${nodeid}.json`, { lastModified: Date.now() })
                             let data = new FormData
-                            data.append('assetsDirPath', config.dataSavePath)
-                            data.append('file[]', 数据文件)
-                            let url = '/api/asset/upload'
+                            data.append('path', config.dataSavePath+'/'+`graph-${nodeid}.json`)
+                            data.append('file', 数据文件)
+                            let url = '/api/file/putFile'
                             // let filepath = ""
                             await fetch(url, {
                                 body: data,
