@@ -9,7 +9,7 @@ import { useGraphOptions } from '../data/useGraphOptions.js'
 import { useInitData } from '../data/useInitData.js'
 import { getBlockByID } from '../utils/api.js';
 import ToolsBar from './ToolsBar.vue';
-import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
+import { getAllLinks, addNode, expand1LayerOfRelationship,expand2LayerOfRelationship, addEdge, nodeLight } from '../js/base.js'
 import { config } from '../js/config.js'
 
 
@@ -45,7 +45,7 @@ async function createInitData(){
                         // expand1LayerOfRelationship()
                         await getBlockByID(e.root_id).then(async e=>{
                             console.log(nodeid,e.root_id)
-                            await expand1LayerOfRelationship(data, e.root_id,e.fcontent)
+                            await expand2LayerOfRelationship(data, e.root_id,e.fcontent,true)
                             await myGraph.changeData(data)
                         })
                         

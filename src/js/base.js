@@ -40,8 +40,14 @@ export async function addEdge(graphData,edge) {
     }
 }
 
-export async function expand1LayerOfRelationship(graphData,id, desc) {
-    let node = { id: id, label: desc }
+export async function expand1LayerOfRelationship(graphData,id, desc,节点标记=false) {
+    let node
+    if(节点标记){
+        node = {id:id,label:desc,style: config.extNodeStyle.style}
+    }else{
+        node = { id: id, label: desc }
+    }
+    
     await addNode(graphData,node)
     await getAllLinks(id).then(async e => {
         // console.log(e)
@@ -62,8 +68,13 @@ export async function expand1LayerOfRelationship(graphData,id, desc) {
 }
 
 
-export async function expand2LayerOfRelationship(graphData,id, desc) {
-    let node = { id: id, label: desc }
+export async function expand2LayerOfRelationship(graphData,id, desc,节点标记=false) {
+    let node
+    if(节点标记){
+        node = {id:id,label:desc,style: config.extNodeStyle.style}
+    }else{
+        node = { id: id, label: desc }
+    }
     await addNode(graphData,node)
     await expand1LayerOfRelationship(graphData,id,desc)
     await getAllLinks(id).then(async e => {
@@ -77,8 +88,13 @@ export async function expand2LayerOfRelationship(graphData,id, desc) {
     // console.log(props.graphData)
 }
 
-export async function expand3LayerOfRelationship(graphData,id, desc) {
-    let node = { id: id, label: desc }
+export async function expand3LayerOfRelationship(graphData,id, desc,节点标记=false) {
+    let node
+    if(节点标记){
+        node = {id:id,label:desc,style: config.extNodeStyle.style}
+    }else{
+        node = { id: id, label: desc }
+    }
     await addNode(graphData,node)
     await expand1LayerOfRelationship(graphData,id,desc)
     await getAllLinks(id).then(async e => {
