@@ -9,7 +9,7 @@ import {
 } from "@element-plus/icons-vue";
 import {fsrs} from "./js/fsrs.js";
 import {获取配置,写入配置} from "./data/writeConfig.js"
-import { 获取数据,写入数据,移除卡片,卡片排序} from './data/cardData.js'
+import { 获取数据,写入数据,移除卡片,卡片排序,更新卡片} from './data/cardData.js'
 import {sql,setBlockAttrs,getBlockByID} from "./utils/api.js"
 // 生命周期=========================================start
 
@@ -20,7 +20,7 @@ onMounted(async ()=>{
   data = await 获取数据()
 
   // console.log(await 移除卡片(data.cardData,'111'))
-  console.log(await 卡片排序(data.cardData))
+  console.log(await 更新卡片(data.cardData,'111',{id:'111'}))
 })
 
 // 生命周期=========================================end

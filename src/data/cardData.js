@@ -26,7 +26,7 @@ export async function 写入数据(obj){
 
 export async function 移除卡片(arr,id){
     let a = []
-    for(let card of obj){
+    for(let card of arr){
         if(card.id != id){
             a.push(card)
         }
@@ -46,5 +46,13 @@ export async function 卡片排序(arr){
 }
 
 export async function 更新卡片(arr,id,value){
-
+    let a = []
+    for(let card of arr){
+        if(card.id == id){
+            a.push(value)
+        }else{
+            a.push(card)
+        }
+    }
+    return a
 }
