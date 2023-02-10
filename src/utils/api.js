@@ -250,7 +250,7 @@ async function 以id获取思源块信息(内容块id) {
 }
 
 async function 设置思源块属性(内容块id, 属性对象) {
-    let url = '/api/attr/setBlockAttrs'
+    let url = '/api/attr/resetBlockAttrs'
     return 解析响应体(向思源请求数据(url, {
         id: 内容块id,
         attrs: 属性对象,
