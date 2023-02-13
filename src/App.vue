@@ -44,7 +44,7 @@ async function tongji() {
   // 队列总数：所有条数
   // ignore：查询属性的条数
   let 复习时间列表 = data.cardData.map((e) => {
-    return { 本次复习时间: e.due, 上次复习时间: e.review };
+    return { 本次复习时间: e.due, 上次复习时间: e.review, 复习次数: e.reps };
   });
   统计数值.队列总数 = 复习时间列表.length;
   for (let e of 复习时间列表) {
@@ -64,7 +64,9 @@ async function tongji() {
       (new Date().getMonth() + 1) +
       "-" +
       new Date().getDate();
-    if (上次复习日期 == 当天日期) {
+
+    if (上次复习日期 == 当天日期 && 复习时间列表.复习次数 > 1) {
+      // 过滤新材料
       统计数值.已复习 += 1;
     }
   }
@@ -177,6 +179,29 @@ async function toggleBtnSub(str = "") {
   }
 }
 
+// async function test() {
+//   let card = {
+//     id: "20211219193749-z5no0e3",
+//     due: "2023-02-13T07:59:26.884Z",
+//     interval: 0,
+//     difficulty: 5,
+//     stability: 2,
+//     retrievability: 1,
+//     grade: -1,
+//     review: "2023-02-11T07:59:26.884Z",
+//     reps: 1,
+//     lapses: 0,
+//     history: [],
+//   };
+//   console.log("00================", card);
+//   await fsrs(card, 1, null).then(async (e) => {
+//     console.log("1111=================", e);
+//     await fsrs(e.cardData, 2, null).then((e) => {
+//       console.log("2222=================", e);
+//     });
+//   });
+// }
+
 // 方法===========================================end
 
 // 生命周期=========================================start
@@ -240,6 +265,7 @@ watch(
         <el-button type="default" v-if="文本框配置.禁用状态" @click="toggleBtn('setting')"
           >设置</el-button
         >
+        <!-- <el-button @click="test">测试</el-button> -->
         <el-button type="default" v-if="!文本框配置.禁用状态" @click="toggleBtn('save')"
           >保存</el-button
         >
