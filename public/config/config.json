@@ -1,1 +1,1 @@
-{"sql":"select distinct root_id from blocks where root_id not in (select block_id from attributes where name='custom-randomNoteType' and value in ('queue','ignore')) and type='d' order by random() limit 1;"}
+{"sql":"select distinct root_id from blocks where root_id not in (select block_id from attributes where name='custom-randomNoteType' and value in ('queue','ignore')) and type='d' and box!='20210808180117-czj9bvb' order by random() limit 1;"}
