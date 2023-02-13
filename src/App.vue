@@ -174,6 +174,7 @@ async function toggleBtnSub(str=''){
     <el-input
       v-model="文本框配置.输入文本"
       type="textarea"
+      resize="none"
       class="w-50 m-2 el-input"
       :disabled="文本框配置.禁用状态"
       :placeholder="文本框配置.显示文本"
@@ -215,6 +216,7 @@ async function toggleBtnSub(str=''){
 }
 .el-aside {
   overflow: hidden;
+  background:white;
 }
 .tongji {
   text-align: right;
