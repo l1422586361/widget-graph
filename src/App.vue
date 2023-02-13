@@ -1,23 +1,10 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import {fsrs} from "./js/fsrs.js";
 import {获取配置,写入配置} from "./data/writeConfig.js"
 import { 获取数据,写入数据,移除卡片,卡片排序,更新卡片,} from './data/cardData.js'
 import {sql,setBlockAttrs,getBlockByID} from "./utils/api.js"
-// 生命周期=========================================start
 
-onMounted(async ()=>{
-  conf = await 获取配置()
-  文本框配置.显示文本 = conf.sql
-  文本框配置.输入文本 = conf.sql
-  data = await 获取数据()
-
-  // console.log(await 移除卡片(data.cardData,'111'))
-  // console.log(await 更新卡片(data.cardData,'111',{id:'111'}))
-  tongji()
-})
-
-// 生命周期=========================================end
 
 // 数据============================================start
 let conf = {}
@@ -26,6 +13,7 @@ const 按钮状态 = reactive({
   禁用复习:false,
   show复习子按钮:false,
   show新材料按钮:false,
+  禁用删除按钮:true,
 })
 
 const 文本框配置 = reactive({
@@ -136,6 +124,16 @@ async function toggleBtn(str=''){
     // console.log(data)
     写入数据(data)
   }
+
+  if(str=='delCard'){
+    data.cardData = await 移除卡片(data.cardData,当前打开文档.id)
+    写入数据(data)
+    tongji()
+    当前打开文档.id=''
+    当前打开文档.name='未打开文档'
+  }
+  
+
 }
 
 async function toggleBtnSub(str=''){
@@ -163,6 +161,31 @@ async function toggleBtnSub(str=''){
 
 // 方法===========================================end
 
+// 生命周期=========================================start
+
+onMounted(async ()=>{
+  conf = await 获取配置()
+  文本框配置.显示文本 = conf.sql
+  文本框配置.输入文本 = conf.sql
+  data = await 获取数据()
+
+  // console.log(await 移除卡片(data.cardData,'111'))
+  // console.log(await 更新卡片(data.cardData,'111',{id:'111'}))
+  tongji()
+})
+
+watch(
+  () => 当前打开文档.id,
+  () => {
+    if(当前打开文档.id == ''){
+      按钮状态.禁用删除按钮 = true
+    }else{
+      按钮状态.禁用删除按钮 = false
+    }
+  },{immediate:true}
+)
+
+// 生命周期=========================================end
 
 </script>
 
@@ -187,6 +210,7 @@ async function toggleBtnSub(str=''){
       <el-button-group>
         <el-button type="primary" :disabled="按钮状态.禁用复习" @click="toggleBtn('fuxi')">复习</el-button>
         <el-button type="default" @click="toggleBtn('newCard')">新材料</el-button>
+        <el-button type="default" @click="toggleBtn('delCard')" :disabled="按钮状态.禁用删除按钮">删除此记录</el-button>
         <el-button type="default" v-if="文本框配置.禁用状态" @click="toggleBtn('setting')">设置</el-button>
         <el-button type="default" v-if="!文本框配置.禁用状态" @click="toggleBtn('save')">保存</el-button>
         <el-button type="default" v-if="!文本框配置.禁用状态" @click="toggleBtn('quxiao')">取消</el-button>
