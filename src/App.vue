@@ -49,13 +49,13 @@ async function tongji(){
   统计数值.队列总数 = 复习时间列表.length
   for(let e of 复习时间列表){
     if(new Date(e.本次复习时间)<new Date()){
-      统计数值.待复习++
+      统计数值.待复习+=1
     }
     // if(new Date(e.上次复习时间))
     let 上次复习日期 = (new Date(e.上次复习时间)).getFullYear() + "-" + ((new Date(e.上次复习时间)).getMonth() + 1) + "-" + (new Date(e.上次复习时间)).getDate();
     let 当天日期 = (new Date()).getFullYear() + "-" + ((new Date()).getMonth() + 1) + "-" + (new Date()).getDate();
     if(上次复习日期 == 当天日期){
-      统计数值.已复习++
+      统计数值.已复习+=1
     }
   }
   统计数值.ignore = await sql(`select count(*) as count from blocks where id in (select block_id from attributes where name='custom-randomNoteType' and value = 'ignore')`).then(e=>{return e[0].count})
@@ -120,7 +120,7 @@ async function toggleBtn(str=''){
     })
     // // 设定属性为已写入队列
     await setBlockAttrs(当前打开文档.id,{"custom-randomNoteType":"queue"})
-    统计数值.队列总数++
+    统计数值.队列总数+=1
     // console.log(data)
     写入数据(data)
   }
@@ -154,6 +154,7 @@ async function toggleBtnSub(str=''){
     // 设定属性为已写入队列
     await setBlockAttrs(当前打开文档.id,{"custom-randomNoteType":"ignore"})
     data.cardData = 移除卡片(data.cardData,当前打开文档.id)
+    统计数值.队列总数+=1
     写入数据(data)
   }
 }
