@@ -78,7 +78,7 @@ async function toggleBtn(str=''){
           当前打开文档.id = e.root_id
           当前打开文档.name = e.fcontent
         })
-        window.open("siyuan://blocks/" + 当前打开文档.id);
+        // window.open("siyuan://blocks/" + 当前打开文档.id);
         break
 
       }else{
@@ -113,7 +113,7 @@ async function toggleBtn(str=''){
         
       })
     })
-    window.open("siyuan://blocks/" + 当前打开文档.id);
+    // window.open("siyuan://blocks/" + 当前打开文档.id);
     // console.log(newCard[0].root_id)
     await fsrs({id:当前打开文档.id},-1,globalData).then(e=>{
       data.cardData.push(e.cardData)
@@ -153,7 +153,7 @@ async function toggleBtnSub(str=''){
   if(str=='ignore'){
     // 设定属性为已写入队列
     await setBlockAttrs(当前打开文档.id,{"custom-randomNoteType":"ignore"})
-    data.cardData = 移除卡片(data.cardData,当前打开文档.id)
+    data.cardData = await 移除卡片(data.cardData,当前打开文档.id)
     统计数值.队列总数+=1
     写入数据(data)
   }
