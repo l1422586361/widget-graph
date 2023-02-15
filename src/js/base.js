@@ -184,17 +184,17 @@ export async function getAllLinks(id) {
     let 条件 = ''
     // let ignoreNote = config.ignoreNote.join('\',\'')
     if (id) {
-        条件 = `and (t1.def_block_id = '${id}' or t1.root_id = '${id}')`
+        条件 = `and (t1.def_block_root_id = '${id}' or t1.root_id = '${id}')`
     }
     // if (type) {
     //     条件 += `and t2.type in ('${type}') and t3.type in ('${type}')`
     // }
     // 语句有误，不需要这个条件了
     if (ignoreNote) {
-        条件 += `and t1.def_block_id not in ('${ignoreNote}') and t1.root_id not in ('${ignoreNote}')`
+        条件 += `and t1.def_block_root_id not in ('${ignoreNote}') and t1.root_id not in ('${ignoreNote}')`
     }
     let sqldata = `select t2.box as sourceBox,t3.box as targetBox,t4.root_id as sourceId,t4.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
-    left join blocks t2 on t1.def_block_id = t2.id
+    left join blocks t2 on t1.def_block_root_id = t2.id
     LEFT JOIN blocks t3 on t1.root_id = t3.id
     join blocks t4 on t4.id = t2.root_id
     where  1=1 ${条件}
@@ -213,12 +213,12 @@ export async function getDocSort(arr) {
     let str = arr.join('\',\'')
     let type = blockType.join('\',\'')
     let sqldata = `select t1.id,t1.fcontent,IFNULL(t2.backcount,0) as backcount,ifnull(t3.frontcount,0) as frontcount from blocks t1
-    left join ( select def_block_id as id,count(distinct root_id) as backcount from refs
- where root_id in (select id from blocks where type in ('${type}'))
-  GROUP BY def_block_id) t2 on t1.id = t2.id
-    left join (select root_id as id,count(distinct def_block_id) as frontcount from refs 
-where def_block_id in (select id from blocks where type in ('${type}'))
- GROUP BY root_id) t3 on t1.id = t3.id
+    left join ( select a1.def_block_root_id as id,count(distinct a1.root_id) as backcount from refs a1
+        left join blocks a2 on a2.id = a1.def_block_root_id
+  GROUP BY a1.def_block_root_id  ) t2 on t1.id = t2.id
+    left join (select a1.root_id as id,count(distinct a2.root_id) as frontcount from refs a1
+    left join blocks a2 on a2.id = a1.def_block_id
+ GROUP BY a1.root_id) t3 on t1.id = t3.id
     where t1.type in ('${type}') and t1.id in ('${str}')
     ORDER BY IFNULL(t2.backcount,0) desc,ifnull(t3.frontcount,0) desc;`
     // console.log('sql',sqldata)
