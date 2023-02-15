@@ -186,17 +186,19 @@ export async function getAllLinks(id) {
     if (id) {
         条件 = `and (t1.def_block_id = '${id}' or t1.root_id = '${id}')`
     }
-    if (type) {
-        条件 += `and t2.type in ('${type}') and t3.type in ('${type}')`
-    }
+    // if (type) {
+    //     条件 += `and t2.type in ('${type}') and t3.type in ('${type}')`
+    // }
+    // 语句有误，不需要这个条件了
     if (ignoreNote) {
         条件 += `and t1.def_block_id not in ('${ignoreNote}') and t1.root_id not in ('${ignoreNote}')`
     }
-    let sqldata = `select t2.box as sourceBox,t3.box as targetBox,t1.def_block_id as sourceId,t2.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
+    let sqldata = `select t2.box as sourceBox,t3.box as targetBox,t4.root_id as sourceId,t4.fcontent as sourceDesc,t1.root_id as targetId,t3.fcontent as targetDesc,count(*) as count from refs t1
     left join blocks t2 on t1.def_block_id = t2.id
     LEFT JOIN blocks t3 on t1.root_id = t3.id
+    join blocks t4 on t4.id = t2.root_id
     where  1=1 ${条件}
-    GROUP BY t1.def_block_id,t1.root_id
+    GROUP BY t4.root_id,t1.root_id
     ;`
     // console.log(sqldata)
     return await sql(sqldata).then(res => {
