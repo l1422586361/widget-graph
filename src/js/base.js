@@ -239,9 +239,9 @@ export async function getDocCount(id) {
     left join ( select def_block_id as id,count(distinct root_id) as backcount from refs
  where root_id in (select id from blocks where type in ('${type}'))
   GROUP BY def_block_id) t2 on t1.id = t2.id
-    left join (select root_id as id,count(distinct def_block_id) as frontcount from refs 
-where def_block_id in (select id from blocks where type in ('${type}'))
- GROUP BY root_id) t3 on t1.id = t3.id
+    left join (select t1.root_id as id,count(distinct t2.root_id) as frontcount from refs t1
+	left join blocks t2 on t2.id = t1.def_block_id
+ GROUP BY t1.root_id) t3 on t1.id = t3.id
     where t1.type = 'd' and t1.id ='${id}';`
     return await sql(sqldata).then(res => {
         // console.log(res)
@@ -352,12 +352,13 @@ export async function getFrontLinks(nodeid) {
     //  sourceName sourceId targetName targetId times
     let type = blockType.join('\',\'')
     let sqldata = `select 
-    t3.content as sourceName , t3.id as sourceId , t1.content as targetName , t1.id as targetId, count(t1.id) as times
+    t3.content as sourceName , t3.id as sourceId , t4.content as targetName , t4.id as targetId, count(t1.id) as times
     from blocks t1
     join refs t2 on t1.id = t2.def_block_id  -- 文档id与其引用块id ，可以通过refs里的不同id字段查询blocks里的对应信息
     join blocks t3 on t3.id = t2.root_id     -- 引用块root_id 与其信息
-    where t1.type in ('${type}') and t3.id = '${nodeid}'
-    group by t1.id,t3.id;`
+    join blocks t4 on t4.id = t1.root_id
+    where t3.id = '${nodeid}'
+    group by t1.root_id,t3.id;`
     // console.log(sqldata)
     return await sql(sqldata).then(res => {
         // console.log(res)
