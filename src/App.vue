@@ -34,6 +34,11 @@ const 统计数值 = reactive({
 });
 
 const globalData = null;
+const 延期天数 = ref(7)
+const 延期按钮状态 = reactive({
+  显示表单: false,
+  禁用延期按钮: false,
+})
 // 数据============================================end
 
 // 方法===========================================start
@@ -148,6 +153,32 @@ async function toggleBtn(str = "") {
   }
 }
 
+async function toggleBtnYanQi(str=""){
+  if(str=="yanqi"){
+    延期按钮状态.显示表单 = true
+    延期按钮状态.禁用延期按钮 = true
+  }
+  if(str=="canal"){
+    延期按钮状态.显示表单 = false
+    延期按钮状态.禁用延期按钮 = false
+  }
+  if(str=="save"){
+    for(let card of data.cardData){
+      if(card.id == 当前打开文档.id){
+        let date = new Date()
+        date = date.setDate(date.getDate() + 延期天数.value)
+        card.due = new Date(date).toISOString()
+        更新卡片(data.cardData,当前打开文档.id,card)
+      }
+    }
+    写入数据(data)
+    延期按钮状态.显示表单 = false
+    延期按钮状态.禁用延期按钮 = false
+    当前打开文档.id = "";
+    当前打开文档.name = "未打开文档";
+  } 
+}
+
 async function toggleBtnSub(str = "") {
   按钮状态.show复习子按钮 = false;
   按钮状态.禁用复习 = false;
@@ -176,6 +207,7 @@ async function toggleBtnSub(str = "") {
     data.cardData = await 移除卡片(data.cardData, 当前打开文档.id);
     统计数值.队列总数 += 1;
     写入数据(data);
+    按钮状态.show新材料按钮 = false
   }
 }
 
@@ -222,6 +254,9 @@ watch(
   () => {
     if (当前打开文档.id == "") {
       按钮状态.禁用删除按钮 = true;
+      按钮状态.show复习子按钮 = false
+      按钮状态.禁用复习 = false
+      按钮状态.show新材料按钮 = false
     } else {
       按钮状态.禁用删除按钮 = false;
     }
@@ -243,48 +278,51 @@ watch(
       :placeholder="文本框配置.显示文本"
     />
     <el-row :gutter="20">
-      <el-col :span="12">当前：{{ 当前打开文档.name }}</el-col>
-      <el-col :span="12" class="tongji"
-        >{{ 统计数值.待复习 }}/{{ 统计数值.已复习 }}/{{ 统计数值.队列总数 }}/{{
+      <el-col :span="12" :title="当前打开文档.name" :size="small">当前：{{ 当前打开文档.name.substring(0,10) }}</el-col>
+      <el-col :span="12" class="tongji" title="待复习/已复习/队列总数/ignore">{{ 统计数值.待复习 }}/{{ 统计数值.已复习 }}/{{ 统计数值.队列总数 }}/{{
           统计数值.ignore
         }}</el-col
       >
     </el-row>
     <el-row>
       <el-button-group>
-        <el-button type="primary" :disabled="按钮状态.禁用复习" @click="toggleBtn('fuxi')"
-          >复习</el-button
-        >
+        <el-button type="primary" :disabled="按钮状态.禁用复习" @click="toggleBtn('fuxi')">复习</el-button>
         <el-button type="default" @click="toggleBtn('newCard')">新材料</el-button>
-        <el-button
-          type="default"
-          @click="toggleBtn('delCard')"
-          :disabled="按钮状态.禁用删除按钮"
-          >删除此记录</el-button
-        >
-        <el-button type="default" v-if="文本框配置.禁用状态" @click="toggleBtn('setting')"
-          >设置</el-button
-        >
+        <el-button type="default" @click="toggleBtn('delCard')" :disabled="按钮状态.禁用删除按钮">删除此记录</el-button>
+        
+        <el-button type="default" v-if="文本框配置.禁用状态" @click="toggleBtn('setting')">设置</el-button>
         <!-- <el-button @click="test">测试</el-button> -->
-        <el-button type="default" v-if="!文本框配置.禁用状态" @click="toggleBtn('save')"
-          >保存</el-button
-        >
-        <el-button type="default" v-if="!文本框配置.禁用状态" @click="toggleBtn('quxiao')"
-          >取消</el-button
-        >
+        <el-button type="default" v-if="!文本框配置.禁用状态" @click="toggleBtn('save')">保存</el-button>
+        <el-button type="default" v-if="!文本框配置.禁用状态" @click="toggleBtn('quxiao')">取消</el-button>
       </el-button-group>
     </el-row>
     <el-row>
-      <el-button-group v-if="按钮状态.show复习子按钮">
+      <el-button-group v-if="按钮状态.show复习子按钮" size="small">
         <el-button @click="toggleBtnSub('wangji')">忘记</el-button>
         <el-button @click="toggleBtnSub('jizhu')">记住</el-button>
         <el-button @click="toggleBtnSub('zhangwo')">掌握</el-button>
         <el-button @click="toggleBtnSub('chongzhi')">重置为新材料</el-button>
         <el-button @click="toggleBtnSub('ignore')">不再推送</el-button>
+        <el-button type="default" @click="toggleBtnYanQi('yanqi')" :disabled="延期按钮状态.禁用延期按钮">延期</el-button>
       </el-button-group>
       <el-button-group v-if="按钮状态.show新材料按钮">
         <el-button @click="toggleBtnSub('ignore')">不再推送</el-button>
+        <el-button type="default" @click="toggleBtnYanQi('yanqi')" :disabled="延期按钮状态.禁用延期按钮">延期</el-button>
       </el-button-group>
+
+      
+    </el-row>
+    <el-row>
+      <el-form :inline="true" size="small" v-if="延期按钮状态.显示表单">
+        <el-form-item>
+          延期<el-input-number v-model="延期天数" :min="1" :max="60" @change="handleChange" />天
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="toggleBtnYanQi('save')">确定</el-button>
+          <el-button @click="toggleBtnYanQi('canal')">取消</el-button>
+        </el-form-item>
+        
+      </el-form>
     </el-row>
   </el-aside>
 </template>
