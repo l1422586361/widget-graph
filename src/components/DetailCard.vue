@@ -36,14 +36,14 @@
                     </el-descriptions> -->
 
           <div v-for="note in backNoteList" :key="note.id" class="text item">
-            <el-link @click="jumpToNote(note_id)">{{
+            <el-link @click="jumpToNote(note.id)">{{
               note.name
             }}</el-link>
           </div>
         </el-tab-pane>
         <el-tab-pane :label="'引用了(' + refNoteList.length + ')'" name="second">
           <div v-for="note in refNoteList" :key="note.id" class="text item">
-            <el-link @click="jumpToNote(note_id)">{{
+            <el-link @click="jumpToNote(note.id)">{{
               note.name
             }}</el-link>
           </div>
