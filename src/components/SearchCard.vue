@@ -19,7 +19,7 @@
                     <el-descriptions class="result-list" :title="info.fcontent.slice(0, 20)" :column="3" size="default">
                         <template #extra>
                             <el-button-group class="ml-4" size="default">
-                                <el-button size="small" @click="openNote('siyuan://blocks/'+info.id)"><el-icon><Link /></el-icon></el-button>
+                                <el-button size="small" @click="jumpToNote(info.id)"><el-icon><Link /></el-icon></el-button>
                                 <el-button size="small" @click="add1Node(info.id, info.fcontent)">+1</el-button>
                                 <el-button size="small" @click="add2Node(info.id, info.fcontent)">+2</el-button>
                                 <el-button size="small" @click="add3Node(info.id, info.fcontent)">+3</el-button>
@@ -49,6 +49,7 @@ import { getAllLinks, addNode, expand1LayerOfRelationship, addEdge, nodeLight } 
 import { config } from '../js/config.js'
 import { Link } from '@element-plus/icons-vue'
 import { Search } from '@element-plus/icons-vue'
+import siyuanTools from '../js/siyuanTools.js'
 
 const props = defineProps(
     {
@@ -62,7 +63,9 @@ let input1 = ref('')
 const nodeLists = ref([]) // 关键字查询结果
 
 
-
+function jumpToNote(note_id){
+    siyuanTools.VirtualOpen(note_id)
+}
 
 function openNote(url){
     window.open(url,'_blank')

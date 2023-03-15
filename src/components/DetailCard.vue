@@ -11,7 +11,7 @@
             <el-button type="defult" @click="closeWindow()">close</el-button>
           </template>
           <el-descriptions-item label-align="right" label="id"
-            ><el-link :href="nodeInfo.url" target="_blank">{{
+            ><el-link @click="jumpToNote(nodeInfo.id)">{{
               nodeInfo.id
             }}</el-link></el-descriptions-item
           >
@@ -36,14 +36,14 @@
                     </el-descriptions> -->
 
           <div v-for="note in backNoteList" :key="note.id" class="text item">
-            <el-link :href="'siyuan://blocks/' + note.id" target="_blank">{{
+            <el-link @click="jumpToNote(note_id)">{{
               note.name
             }}</el-link>
           </div>
         </el-tab-pane>
         <el-tab-pane :label="'引用了(' + refNoteList.length + ')'" name="second">
           <div v-for="note in refNoteList" :key="note.id" class="text item">
-            <el-link :href="'siyuan://blocks/' + note.id" target="_blank">{{
+            <el-link @click="jumpToNote(note_id)">{{
               note.name
             }}</el-link>
           </div>
@@ -71,6 +71,7 @@ import { ref, onMounted, watch, reactive } from "vue";
 import { getBlockByID, getBacklink } from "../utils/api.js";
 import { getDocCount, getFrontLinks } from "../js/base.js";
 // import type { TabsPaneContext } from 'element-plus'
+import siyuanTools from '../js/siyuanTools.js'
 
 const activeName = ref("first");
 // const handleClick = (tab: TabsPaneContext, event: Event) => {
@@ -90,6 +91,9 @@ const emit = defineEmits(["toggleRightWindows"]);
 function closeWindow() {
   emit("toggleRightWindows", "Info");
 }
+function jumpToNote(note_id){
+  siyuanTools.VirtualOpen(note_id)
+}
 
 async function getNodeInfo(id) {
   // let id = props.activeNode.id
@@ -106,7 +110,7 @@ async function getNodeInfo(id) {
       nodeInfo.updated = e[0].updated;
       nodeInfo.frontLinkCount = e[1][0].frontcount;
       nodeInfo.backLinkCount = e[1][0].backcount;
-      nodeInfo.url = "siyuan://blocks/" + id;
+      // nodeInfo.url = "siyuan://blocks/" + id;
 
       // console.log(e[2],e[3])
       // console.log(backNoteList,refNoteList)
