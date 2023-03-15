@@ -4,6 +4,7 @@ import { fsrs } from "./js/fsrs.js";
 import { 获取配置, 写入配置 } from "./data/writeConfig.js";
 import { 获取数据, 写入数据, 移除卡片, 卡片排序, 更新卡片 } from "./data/cardData.js";
 import { sql, setBlockAttrs, getBlockByID } from "./utils/api.js";
+import siyuanTools from './js/siyuanTools.js'
 
 // 数据============================================start
 let conf = {};
@@ -42,6 +43,10 @@ const 延期按钮状态 = reactive({
 // 数据============================================end
 
 // 方法===========================================start
+
+function jumpToNote(note_id){
+  siyuanTools.VirtualOpen(note_id);
+}
 
 async function tongji() {
   // 待复习：时间小于当前时间
@@ -99,7 +104,8 @@ async function toggleBtn(str = "") {
           当前打开文档.id = e.root_id;
           当前打开文档.name = e.fcontent;
         });
-        window.open("siyuan://blocks/" + 当前打开文档.id);
+        // window.open("siyuan://blocks/" + 当前打开文档.id);
+        jumpToNote(当前打开文档.id)
         break;
       } else {
         当前打开文档.name = "当前已完成复习！";
@@ -132,7 +138,8 @@ async function toggleBtn(str = "") {
         当前打开文档.name = e.fcontent;
       });
     });
-    window.open("siyuan://blocks/" + 当前打开文档.id);
+    // window.open("siyuan://blocks/" + 当前打开文档.id);
+    jumpToNote(当前打开文档.id)
     // console.log(newCard[0].root_id)
     await fsrs({ id: 当前打开文档.id }, -1, globalData).then((e) => {
       data.cardData.push(e.cardData);
