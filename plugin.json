@@ -1,7 +1,7 @@
 {
   "name": "plugin-sample-vite-svelte",
   "author": "frostime",
-  "url": "https://github.com/siyuan-note/plugin-sample-vite-svelte",
+  "url": "https://github.com/l1422586361/widget-graph",
   "version": "0.4.1",
   "minAppVersion": "3.2.1",
   "disabledInPublish": true,
