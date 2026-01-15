@@ -1,9 +1,17 @@
 <script lang="ts">
-  import { Graph as G6 } from '@antv/g6';
+  import { Graph } from '@antv/g6';
 
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   let container: HTMLElement;
+  let graph: Graph;
+
+  export function updateGraphSize() {
+    if (container && graph) {
+      const rect = container.getBoundingClientRect();
+      graph.resize(rect.width, rect.height);
+    }
+  }
 
   onMount(() => {
     // 定义图数据
@@ -17,11 +25,11 @@
       ]
     };
 
-    // 创建 G6 图实例
-    const graph = new G6.Graph({
+    const rect = container.getBoundingClientRect();
+    graph = new Graph({
       container,
-      width: 500,
-      height: 400,
+      width: rect.width,
+      height: rect.height,
       defaultNode: {
         size: [40, 40],
         style: {
@@ -36,15 +44,24 @@
       }
     });
 
-    // 加载数据
-    graph.data(data);
+    graph.setData(data);
     graph.render();
 
+    window.addEventListener('resize', updateGraphSize);
+
     return () => {
-      // 组件销毁时销毁图实例
-      graph.destroy();
+      window.removeEventListener('resize', updateGraphSize);
+      if (graph) {
+        graph.destroy();
+      }
     };
+  });
+
+  onDestroy(() => {
+    if (graph) {
+      graph.destroy();
+    }
   });
 </script>
 
-<div bind:this={container}></div>
+<div bind:this={container} style="width: 100%; height: 100%;"></div>

@@ -34,6 +34,7 @@ import { IMenuItem } from "siyuan/types";
 import HelloExample from "@/hello.svelte";
 import SettingExample from "@/setting-example.svelte";
 import Graph from "@/graph.svelte";
+import type GraphComponent from "@/graph.svelte";
 
 import { SettingUtils } from "./libs/setting-utils";
 import { svelteDialog } from "./libs/dialog";
@@ -48,6 +49,9 @@ export default class PluginSample extends Plugin {
     private isMobile: boolean;
     private blockIconEventBindThis = this.blockIconEvent.bind(this);
     private settingUtils: SettingUtils;
+    
+    private graphInstance: GraphComponent | null = null;
+    private dockElement: HTMLElement | null = null;
 
 
     updateProtyleToolbar(toolbar: Array<string | IMenuItem>) {
@@ -147,49 +151,89 @@ export default class PluginSample extends Plugin {
         this.addDock({
             config: {
                 position: "LeftBottom",
-                size: { width: 200, height: 0 },
+                size: { width: 400, height: 0 },
                 icon: "iconSaving",
-                title: "Custom Dock",
+                title: "Graph Dock",
                 hotkey: "⌥⌘W",
             },
             data: {
-                text: "This is my custom dock"
+                text: "Graph"
             },
             type: DOCK_TYPE,
             resize() {
-                console.log(DOCK_TYPE + " resize");
+                console.log("[Graph Dock] 调整大小被调用");
+                console.log("[Graph Dock] dockElement:", this.dockElement);
+                console.log("[Graph Dock] graphInstance:", this.graphInstance);
+                if (this.dockElement) {
+                    const container = this.dockElement.querySelector('#graphContainer');
+                    console.log("[Graph Dock] container:", container);
+                    if (container && this.graphInstance) {
+                        const rect = container.getBoundingClientRect();
+                        console.log("[Graph Dock] 容器尺寸:", rect.width, rect.height);
+                        if (this.graphInstance && typeof this.graphInstance.updateGraphSize === 'function') {
+                            console.log("[Graph Dock] 调用 updateGraphSize");
+                            this.graphInstance.updateGraphSize();
+                        }
+                    }
+                }
             },
             update() {
-                console.log(DOCK_TYPE + " update");
+                console.log("[Graph Dock] 更新被调用");
             },
-            init: (dock) => {
+            init(dock) {
+                console.log("[Graph Dock] 初始化被调用");
+                console.log("[Graph Dock] dock:", dock);
+                console.log("[Graph Dock] dock.element:", dock.element);
+                console.log("[Graph Dock] 是否为移动端:", this.isMobile);
+                
+                this.dockElement = dock.element;
+                
                 if (this.isMobile) {
+                    console.log("[Graph Dock] 渲染移动端布局");
                     dock.element.innerHTML = `<div class="toolbar toolbar--border toolbar--dark">
                     <svg class="toolbar__icon"><use xlink:href="#iconEmoji"></use></svg>
-                        <div class="toolbar__text">Custom Dock</div>
+                        <div class="toolbar__text">Graph Dock</div>
                     </div>
-                    <div class="fn__flex-1 plugin-sample__custom-dock">
-                        ${dock.data.text}
-                    </div>
+                    <div class="fn__flex-1 plugin-sample__custom-dock" id="graphContainer"></div>
                     </div>`;
                 } else {
+                    console.log("[Graph Dock] 渲染桌面端布局");
                     dock.element.innerHTML = `<div class="fn__flex-1 fn__flex-column">
                     <div class="block__icons">
                         <div class="block__logo">
                             <svg class="block__logoicon"><use xlink:href="#iconEmoji"></use></svg>
-                            Custom Dock
+                            Graph Dock
                         </div>
                         <span class="fn__flex-1 fn__space"></span>
                         <span data-type="min" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="Min ${adaptHotkey("⌘W")}"><svg class="block__logoicon"><use xlink:href="#iconMin"></use></svg></span>
                     </div>
-                    <div class="fn__flex-1 plugin-sample__custom-dock">
-                        ${dock.data.text}
-                    </div>
+                    <div class="fn__flex-1 plugin-sample__custom-dock" id="graphContainer"></div>
                     </div>`;
+                }
+                
+                console.log("[Graph Dock] 查找 graphContainer");
+                const graphContainer = dock.element.querySelector('#graphContainer');
+                console.log("[Graph Dock] graphContainer 找到:", graphContainer);
+                
+                if (graphContainer) {
+                    console.log("[Graph Dock] 创建 Graph 组件");
+                    this.graphInstance = new Graph({
+                        target: graphContainer
+                    });
+                    console.log("[Graph Dock] Graph 组件已创建:", this.graphInstance);
+                } else {
+                    console.error("[Graph Dock] 错误: graphContainer 未找到!");
                 }
             },
             destroy() {
-                console.log("destroy dock:", DOCK_TYPE);
+                console.log("[Graph Dock] 销毁被调用");
+                if (this.graphInstance) {
+                    console.log("[Graph Dock] 销毁 Graph 组件");
+                    this.graphInstance.$destroy();
+                    this.graphInstance = null;
+                }
+                this.dockElement = null;
+                console.log("[Graph Dock] 已销毁");
             }
         });
 
