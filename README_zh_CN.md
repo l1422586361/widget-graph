@@ -4,8 +4,8 @@
 [English](./README.md)
 
 
-> 本例同 [siyuan/plugin-sample](https://github.com/siyuan-note/plugin-sample) [v0.3.5](https://github.com/siyuan-note/plugin-sample/tree/v0.3.5)
-
+> 本例同 [siyuan/plugin-sample](https://github.com/siyuan-note/plugin-sample) [v0.4.1](https://github.com/siyuan-note/plugin-sample/tree/v0.4.1)
+ 
 1. 使用 vite 打包
 2. 使用符号链接、而不是把项目放到插件目录下的模式进行开发
 3. 内置对 svelte 框架的支持
@@ -15,6 +15,11 @@
    > **这里还提供了一个 vite+solidjs 的模板**: [frostime/plugin-sample-vite-solidjs](https://github.com/frostime/plugin-sample-vite-solidjs)
 
 4. 提供一个github action 模板，能自动生成package.zip并上传到新版本中
+
+> [!NOTE]
+> 当前模板案例基于 `svelte4` 版本，我们在 `svelte5` 分支中维护了一个实验性模板，将 Svelte 升级至 5.x 版本。
+>
+> 未来我们会将主分支默认版本切换至 svelte5。
 
 ## 开始
 
@@ -98,21 +103,36 @@ make-link 命令会创建符号链接将你的 `dev` 目录绑定到思源的插
   "name": "plugin-sample-vite-svelte",
   "author": "frostime",
   "url": "https://github.com/siyuan-note/plugin-sample-vite-svelte",
-  "version": "0.1.3",
-  "minAppVersion": "2.8.8",
-  "backends": ["windows", "linux", "darwin"],
-  "frontends": ["desktop"],
+  "version": "0.4.1",
+  "minAppVersion": "3.2.1",
+  "disabledInPublish": true,
+  "backends": [
+    "windows",
+    "linux",
+    "darwin",
+    "ios",
+    "android",
+    "harmony",
+    "docker"
+  ],
+  "frontends": [
+    "desktop",
+    "mobile",
+    "browser-desktop",
+    "browser-mobile",
+    "desktop-window"
+  ],
   "displayName": {
-    "en_US": "Plugin sample with vite and svelte",
+    "default": "Plugin sample with vite and svelte",
     "zh_CN": "插件样例 vite + svelte 版"
   },
   "description": {
-    "en_US": "SiYuan plugin sample with vite and svelte",
+    "default": "SiYuan plugin sample with vite and svelte",
     "zh_CN": "使用 vite 和 svelte 开发的思源插件样例"
   },
   "readme": {
-    "en_US": "README_en_US.md",
-    "zh_CN": "README.md"
+    "default": "README.md",
+    "zh_CN": "README_zh_CN.md"
   },
   "funding": {
     "openCollective": "",
@@ -123,7 +143,8 @@ make-link 命令会创建符号链接将你的 `dev` 目录绑定到思源的插
     ]
   },
   "keywords": [
-    "sample", "示例"
+    "sample",
+    "示例"
   ]
 }
 ```

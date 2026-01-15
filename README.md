@@ -3,7 +3,7 @@
 
 [中文版](./README_zh_CN.md)
 
-> Consistent with [siyuan/plugin-sample](https://github.com/siyuan-note/plugin-sample) [v0.3.5](https://github.com/siyuan-note/plugin-sample/tree/v0.3.5)
+> Consistent with [siyuan/plugin-sample](https://github.com/siyuan-note/plugin-sample) [v0.4.1](https://github.com/siyuan-note/plugin-sample/tree/v0.4.1)
 
 
 
@@ -18,13 +18,10 @@
 4. Provides a github action template to automatically generate package.zip and upload to new release
 
 
-> [!TIP]
-> You can also use our maintained [siyuan-plugin-cli](https://www.npmjs.com/package/siyuan-plugin-cli) command-line tool to directly build plugins in your local terminal.
+> [!NOTE]
+> The current template case is based on `svelte4` version, we maintain an experimental template in the `svelte5` branch, which upgrades Svelte to 5.x version.
 >
-> Additionally, for the `make-link` related commands mentioned in this plugin, all future updates will be made in [siyuan-plugin-cli](https://www.npmjs.com/package/siyuan-plugin-cli).
->
-> The built-in `make-link` scripts may also be removed in a future version, in favor of using the `siyuan-plugin-cli` tool, aiming to simplify the workload of maintaining multiple plugin templates.
-
+> In the future, we will switch the default main branch to svelte5.
 
 ## Get started
 
@@ -35,6 +32,13 @@
 4. Run the `pnpm run make-link` command to create a symbolic link (Windows developers, please refer to the "make-link on Windows" section below).
 5. Execute `pnpm run dev` for real-time compilation.
 6. Open the marketplace in SiYuan and enable the plugin in the download tab.
+
+> [!TIP]
+> You can also use our maintained [siyuan-plugin-cli](https://www.npmjs.com/package/siyuan-plugin-cli) command-line tool to directly build plugins in your local terminal.
+>
+> Additionally, for the `make-link` related commands mentioned in this plugin, all future updates will be made in [siyuan-plugin-cli](https://www.npmjs.com/package/siyuan-plugin-cli).
+>
+> The built-in `make-link` scripts may also be removed in a future version, in favor of using the `siyuan-plugin-cli` tool, aiming to simplify the workload of maintaining multiple plugin templates.
 
 ### Setting the Target Directory for the make-link Command
 
@@ -99,21 +103,36 @@ conveniently.
   "name": "plugin-sample-vite-svelte",
   "author": "frostime",
   "url": "https://github.com/siyuan-note/plugin-sample-vite-svelte",
-  "version": "0.1.3",
-  "minAppVersion": "2.8.8",
-  "backends": ["windows", "linux", "darwin"],
-  "frontends": ["desktop"],
+  "version": "0.4.1",
+  "minAppVersion": "3.2.1",
+  "disabledInPublish": true,
+  "backends": [
+    "windows",
+    "linux",
+    "darwin",
+    "ios",
+    "android",
+    "harmony",
+    "docker"
+  ],
+  "frontends": [
+    "desktop",
+    "mobile",
+    "browser-desktop",
+    "browser-mobile",
+    "desktop-window"
+  ],
   "displayName": {
-    "en_US": "Plugin sample with vite and svelte",
+    "default": "Plugin sample with vite and svelte",
     "zh_CN": "插件样例 vite + svelte 版"
   },
   "description": {
-    "en_US": "SiYuan plugin sample with vite and svelte",
+    "default": "SiYuan plugin sample with vite and svelte",
     "zh_CN": "使用 vite 和 svelte 开发的思源插件样例"
   },
   "readme": {
-    "en_US": "README_en_US.md",
-    "zh_CN": "README.md"
+    "default": "README.md",
+    "zh_CN": "README_zh_CN.md"
   },
   "funding": {
     "openCollective": "",
@@ -124,7 +143,8 @@ conveniently.
     ]
   },
   "keywords": [
-    "sample", "示例"
+    "sample",
+    "示例"
   ]
 }
 ```
