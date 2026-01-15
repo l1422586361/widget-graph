@@ -1,15 +1,21 @@
 <script lang="ts">
   import { Graph } from '@antv/g6';
 
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, afterUpdate } from 'svelte';
 
   let container: HTMLElement;
   let graph: Graph;
 
-  export function updateGraphSize() {
+  export function updateGraphSize(width?: number, height?: number) {
     if (container && graph) {
-      const rect = container.getBoundingClientRect();
-      graph.resize(rect.width, rect.height);
+      if (width !== undefined && height !== undefined) {
+        console.log('[Graph] 使用传入的尺寸:', width, height);
+        graph.resize(width, height);
+      } else {
+        const rect = container.getBoundingClientRect();
+        console.log('[Graph] 更新画布尺寸:', rect.width, rect.height);
+        graph.resize(rect.width, rect.height);
+      }
     }
   }
 
@@ -32,6 +38,8 @@
     };
 
     const rect = container.getBoundingClientRect();
+    console.log('[Graph] 初始容器尺寸:', rect.width, rect.height);
+    
     graph = new Graph({
       container,
       width: rect.width,
@@ -81,6 +89,14 @@
         graph.destroy();
       }
     };
+  });
+
+  afterUpdate(() => {
+    if (container && graph) {
+      const rect = container.getBoundingClientRect();
+      console.log('[Graph] afterUpdate 容器尺寸:', rect.width, rect.height);
+      graph.resize(rect.width, rect.height);
+    }
   });
 
   onDestroy(() => {

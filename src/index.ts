@@ -52,6 +52,7 @@ export default class PluginSample extends Plugin {
     
     private graphInstance: GraphComponent | null = null;
     private dockElement: HTMLElement | null = null;
+    private resizeObserver: ResizeObserver | null = null;
 
 
     updateProtyleToolbar(toolbar: Array<string | IMenuItem>) {
@@ -164,16 +165,12 @@ export default class PluginSample extends Plugin {
                 console.log("[Graph Dock] 调整大小被调用");
                 console.log("[Graph Dock] dockElement:", this.dockElement);
                 console.log("[Graph Dock] graphInstance:", this.graphInstance);
-                if (this.dockElement) {
-                    const container = this.dockElement.querySelector('#graphContainer');
-                    console.log("[Graph Dock] container:", container);
-                    if (container && this.graphInstance) {
-                        const rect = container.getBoundingClientRect();
-                        console.log("[Graph Dock] 容器尺寸:", rect.width, rect.height);
-                        if (this.graphInstance && typeof this.graphInstance.updateGraphSize === 'function') {
-                            console.log("[Graph Dock] 调用 updateGraphSize");
-                            this.graphInstance.updateGraphSize();
-                        }
+                if (this.dockElement && this.graphInstance) {
+                    const rect = this.dockElement.getBoundingClientRect();
+                    console.log("[Graph Dock] dockElement 尺寸:", rect.width, rect.height);
+                    if (this.graphInstance && typeof this.graphInstance.updateGraphSize === 'function') {
+                        console.log("[Graph Dock] 调用 updateGraphSize");
+                        this.graphInstance.updateGraphSize(rect.width, rect.height);
                     }
                 }
             },
@@ -221,12 +218,31 @@ export default class PluginSample extends Plugin {
                         target: graphContainer
                     });
                     console.log("[Graph Dock] Graph 组件已创建:", this.graphInstance);
+                    
+                    this.resizeObserver = new ResizeObserver((entries) => {
+                        for (let entry of entries) {
+                            console.log("[Graph Dock] ResizeObserver 触发:", entry.contentRect.width, entry.contentRect.height);
+                            if (this.graphInstance && typeof this.graphInstance.updateGraphSize === 'function') {
+                                console.log("[Graph Dock] 通过 ResizeObserver 调用 updateGraphSize");
+                                this.graphInstance.updateGraphSize();
+                            }
+                        }
+                    });
+                    
+                    this.resizeObserver.observe(this.dockElement);
+                    
+                    console.log("[Graph Dock] ResizeObserver 已设置");
                 } else {
                     console.error("[Graph Dock] 错误: graphContainer 未找到!");
                 }
             },
             destroy() {
                 console.log("[Graph Dock] 销毁被调用");
+                if (this.resizeObserver) {
+                    console.log("[Graph Dock] 停止 MutationObserver");
+                    this.resizeObserver.disconnect();
+                    this.resizeObserver = null;
+                }
                 if (this.graphInstance) {
                     console.log("[Graph Dock] 销毁 Graph 组件");
                     this.graphInstance.$destroy();
