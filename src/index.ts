@@ -186,13 +186,14 @@ export default class PluginSample extends Plugin {
                 this.dockElement = dock.element;
                 
                 if (this.isMobile) {
-                    console.log("[Graph Dock] 渲染移动端布局");
-                    dock.element.innerHTML = `<div class="toolbar toolbar--border toolbar--dark">
-                    <svg class="toolbar__icon"><use xlink:href="#iconEmoji"></use></svg>
-                        <div class="toolbar__text">Graph Dock</div>
-                    </div>
-                    <div class="fn__flex-1 plugin-sample__custom-dock" id="graphContainer"></div>
-                    </div>`;
+                    console.log("[Graph Dock] 渲染移动端布局，移动端不支持");
+                    // dock.element.innerHTML = `<div class="toolbar toolbar--border toolbar--dark">
+                    // <svg class="toolbar__icon"><use xlink:href="#iconEmoji"></use></svg>
+                    //     <div class="toolbar__text">Graph Dock</div>
+                    //     <span id="addCurrentFileAsNode" class="toolbar__icon b3-tooltips b3-tooltips__sw" aria-label="添加当前文件为node"><svg class="block__logoicon"><use xlink:href="#iconAdd"></use></svg></span>
+                    // </div>
+                    // <div class="fn__flex-1 plugin-sample__custom-dock" id="graphContainer"></div>
+                    // </div>`;
                 } else {
                     console.log("[Graph Dock] 渲染桌面端布局");
                     dock.element.innerHTML = `<div class="fn__flex-1 fn__flex-column">
@@ -202,6 +203,7 @@ export default class PluginSample extends Plugin {
                             Graph Dock
                         </div>
                         <span class="fn__flex-1 fn__space"></span>
+                        <span id="addCurrentFileAsNode" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="添加当前文件为node"><svg class="block__logoicon"><use xlink:href="#iconAdd"></use></svg></span>
                         <span data-type="min" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="Min ${adaptHotkey("⌘W")}"><svg class="block__logoicon"><use xlink:href="#iconMin"></use></svg></span>
                     </div>
                     <div class="fn__flex-1 plugin-sample__custom-dock" id="graphContainer"></div>
@@ -218,6 +220,17 @@ export default class PluginSample extends Plugin {
                         target: graphContainer
                     });
                     console.log("[Graph Dock] Graph 组件已创建:", this.graphInstance);
+                    
+                    // 添加按钮点击事件
+                    const addNodeBtn = dock.element.querySelector('#addCurrentFileAsNode');
+                    if (addNodeBtn) {
+                        addNodeBtn.addEventListener('click', () => {
+                            console.log("[Graph Dock] 添加当前文件为node");
+                            // 这里可以添加实际的添加节点逻辑
+                            const currentFile = this.getOpenedTab();
+                            console.log("当前文件:", currentFile);
+                        });
+                    }
                     
                     this.resizeObserver = new ResizeObserver((entries) => {
                         for (let entry of entries) {
