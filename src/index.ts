@@ -8,11 +8,8 @@ import {
     adaptHotkey,
     getFrontend,
     getBackend,
-    // Setting,
-    // fetchPost,
     Protyle,
     openWindow,
-    IOperation,
     Constants,
     openMobileFileById,
     lockScreen,
@@ -29,15 +26,15 @@ import {
     saveLayout
 } from "siyuan";
 import "./index.scss";
-import { IMenuItem } from "siyuan/types";
-
-import HelloExample from "@/hello.svelte";
-import SettingExample from "@/setting-example.svelte";
-import Graph from "@/graph.svelte";
-import type GraphComponent from "@/graph.svelte";
+import { IMenuItem, IOperation } from "siyuan/types";
 
 import { SettingUtils } from "./libs/setting-utils";
 import { svelteDialog } from "./libs/dialog";
+import { GraphModule } from "./modules/graphModule";
+import { DialogModule } from "./modules/dialogModule";
+import HelloExample from "@/hello.svelte";
+import SettingExample from "@/setting-example.svelte";
+// import Graph from "@/graph.svelte";
 
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
@@ -50,10 +47,9 @@ export default class PluginSample extends Plugin {
     private blockIconEventBindThis = this.blockIconEvent.bind(this);
     private settingUtils: SettingUtils;
     
-    private graphInstance: GraphComponent | null = null;
-    private dockElement: HTMLElement | null = null;
-    private resizeObserver: ResizeObserver | null = null;
-
+    // 模块实例
+    private graphModule: GraphModule;
+    private dialogModule: DialogModule;
 
     updateProtyleToolbar(toolbar: Array<string | IMenuItem>) {
         toolbar.push("|");
@@ -71,6 +67,10 @@ export default class PluginSample extends Plugin {
     }
 
     async onload() {
+        // 初始化模块
+        this.graphModule = new GraphModule(this);
+        this.dialogModule = new DialogModule(this);
+
         this.data[STORAGE_NAME] = { readonlyText: "Readonly" };
 
         console.log("loading plugin-sample", this.i18n);
@@ -129,7 +129,7 @@ export default class PluginSample extends Plugin {
                 langKey: "showGraph",
                 hotkey: "⇧⌘G",
                 callback: () => {
-                    this.showGraphDialog();
+                    this.graphModule.showGraphDialog();
                 },
             }
         );
@@ -137,7 +137,7 @@ export default class PluginSample extends Plugin {
             langKey: "showDialog",
             hotkey: "⇧⌘O",
             callback: () => {
-                this.showDialog();
+                this.dialogModule.showDialog();
             },
         });
 
@@ -161,108 +161,17 @@ export default class PluginSample extends Plugin {
                 text: "Graph"
             },
             type: DOCK_TYPE,
-            resize() {
-                console.log("[Graph Dock] 调整大小被调用");
-                console.log("[Graph Dock] dockElement:", this.dockElement);
-                console.log("[Graph Dock] graphInstance:", this.graphInstance);
-                if (this.dockElement && this.graphInstance) {
-                    const rect = this.dockElement.getBoundingClientRect();
-                    console.log("[Graph Dock] dockElement 尺寸:", rect.width, rect.height);
-                    if (this.graphInstance && typeof this.graphInstance.updateGraphSize === 'function') {
-                        console.log("[Graph Dock] 调用 updateGraphSize");
-                        this.graphInstance.updateGraphSize(rect.width, rect.height);
-                    }
-                }
+            resize: () => {
+                this.graphModule.resizeDock();
             },
-            update() {
-                console.log("[Graph Dock] 更新被调用");
+            update: () => {
+                this.graphModule.updateDock();
             },
-            init(dock) {
-                console.log("[Graph Dock] 初始化被调用");
-                console.log("[Graph Dock] dock:", dock);
-                console.log("[Graph Dock] dock.element:", dock.element);
-                console.log("[Graph Dock] 是否为移动端:", this.isMobile);
-                
-                this.dockElement = dock.element;
-                
-                if (this.isMobile) {
-                    console.log("[Graph Dock] 渲染移动端布局，移动端不支持");
-                    // dock.element.innerHTML = `<div class="toolbar toolbar--border toolbar--dark">
-                    // <svg class="toolbar__icon"><use xlink:href="#iconEmoji"></use></svg>
-                    //     <div class="toolbar__text">Graph Dock</div>
-                    //     <span id="addCurrentFileAsNode" class="toolbar__icon b3-tooltips b3-tooltips__sw" aria-label="添加当前文件为node"><svg class="block__logoicon"><use xlink:href="#iconAdd"></use></svg></span>
-                    // </div>
-                    // <div class="fn__flex-1 plugin-sample__custom-dock" id="graphContainer"></div>
-                    // </div>`;
-                } else {
-                    console.log("[Graph Dock] 渲染桌面端布局");
-                    dock.element.innerHTML = `<div class="fn__flex-1 fn__flex-column">
-                    <div class="block__icons">
-                        <div class="block__logo">
-                            <svg class="block__logoicon"><use xlink:href="#iconEmoji"></use></svg>
-                            Graph Dock
-                        </div>
-                        <span class="fn__flex-1 fn__space"></span>
-                        <span id="addCurrentFileAsNode" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="添加当前文件为node"><svg class="block__logoicon"><use xlink:href="#iconAdd"></use></svg></span>
-                        <span data-type="min" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="Min ${adaptHotkey("⌘W")}"><svg class="block__logoicon"><use xlink:href="#iconMin"></use></svg></span>
-                    </div>
-                    <div class="fn__flex-1 plugin-sample__custom-dock" id="graphContainer"></div>
-                    </div>`;
-                }
-                
-                console.log("[Graph Dock] 查找 graphContainer");
-                const graphContainer = dock.element.querySelector('#graphContainer');
-                console.log("[Graph Dock] graphContainer 找到:", graphContainer);
-                
-                if (graphContainer) {
-                    console.log("[Graph Dock] 创建 Graph 组件");
-                    this.graphInstance = new Graph({
-                        target: graphContainer
-                    });
-                    console.log("[Graph Dock] Graph 组件已创建:", this.graphInstance);
-                    
-                    // 添加按钮点击事件
-                    const addNodeBtn = dock.element.querySelector('#addCurrentFileAsNode');
-                    if (addNodeBtn) {
-                        addNodeBtn.addEventListener('click', () => {
-                            console.log("[Graph Dock] 添加当前文件为node");
-                            // 这里可以添加实际的添加节点逻辑
-                            const currentFile = this.getOpenedTab();
-                            console.log("当前文件:", currentFile);
-                        });
-                    }
-                    
-                    this.resizeObserver = new ResizeObserver((entries) => {
-                        for (let entry of entries) {
-                            console.log("[Graph Dock] ResizeObserver 触发:", entry.contentRect.width, entry.contentRect.height);
-                            if (this.graphInstance && typeof this.graphInstance.updateGraphSize === 'function') {
-                                console.log("[Graph Dock] 通过 ResizeObserver 调用 updateGraphSize");
-                                this.graphInstance.updateGraphSize();
-                            }
-                        }
-                    });
-                    
-                    this.resizeObserver.observe(this.dockElement);
-                    
-                    console.log("[Graph Dock] ResizeObserver 已设置");
-                } else {
-                    console.error("[Graph Dock] 错误: graphContainer 未找到!");
-                }
+            init: (dock) => {
+                this.graphModule.initDock(dock);
             },
-            destroy() {
-                console.log("[Graph Dock] 销毁被调用");
-                if (this.resizeObserver) {
-                    console.log("[Graph Dock] 停止 MutationObserver");
-                    this.resizeObserver.disconnect();
-                    this.resizeObserver = null;
-                }
-                if (this.graphInstance) {
-                    console.log("[Graph Dock] 销毁 Graph 组件");
-                    this.graphInstance.$destroy();
-                    this.graphInstance = null;
-                }
-                this.dockElement = null;
-                console.log("[Graph Dock] 已销毁");
+            destroy: () => {
+                this.graphModule.destroyDock();
             }
         });
 
@@ -581,20 +490,6 @@ export default class PluginSample extends Plugin {
         });
     }
 
-    private showGraphDialog(){
-        let dialog = new Dialog({
-            title: "Graph Example",
-            content: `<div id="graphPanel" class="b3-dialog__content"></div>`,
-            width: this.isMobile ? "92vw" : "720px",
-            destroyCallback() {
-                // 可在这里添加销毁逻辑
-            },
-        });
-
-        new Graph({
-            target: dialog.element.querySelector("#graphPanel")
-        });
-    }
 
     private addMenu(rect?: DOMRect) {
         const menu = new Menu("topBarSample", () => {
@@ -1112,6 +1007,7 @@ export default class PluginSample extends Plugin {
             });
         }
     }
+
 
     private getEditor() {
         const editors = getAllEditor();
